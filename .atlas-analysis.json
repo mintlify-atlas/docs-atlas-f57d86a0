@@ -1,0 +1,98 @@
+{
+  "projectType": "frontend",
+  "projectName": "Eufrosine",
+  "projectDescription": "A premium table water company website built with Next.js featuring product showcases, contact forms, and smooth animations",
+  "theme": "almond",
+  "primaryColor": "#0db3fc",
+  "lightColor": "#cbe8fc",
+  "darkColor": "#f4fcfc",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/overview",
+              "features/animations",
+              "features/contact-form",
+              "features/smooth-scroll",
+              "features/carousels"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "components/overview",
+              "components/navbar",
+              "components/hero",
+              "components/products",
+              "components/offers",
+              "components/events",
+              "components/ui-components"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Routes",
+            "pages": [
+              "api/contact",
+              "api/complaint"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Deployment",
+        "groups": [
+          {
+            "group": "Guides",
+            "pages": [
+              "deployment/build",
+              "deployment/environment",
+              "deployment/vercel"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Smooth scroll animations with Lenis",
+    "Framer Motion and GSAP animations",
+    "Product and offer carousels with Embla",
+    "Contact form with nodemailer integration",
+    "Responsive design with Tailwind CSS",
+    "Custom UI components (badge, card, label)",
+    "Privacy policy and terms modals",
+    "Social media integration",
+    "Complaint book system"
+  ],
+  "publicApiSurface": [
+    "POST /api/contact - Send contact form emails",
+    "POST /api/complaint - Submit complaints to book",
+    "OptimizedVideo component",
+    "LenisSmoothScroll component",
+    "CustomStaggeredMenu component",
+    "OffersCarousel component",
+    "ProductsCarousel component",
+    "Badge component",
+    "Card component",
+    "Label component",
+    "GlowingEffect component",
+    "SpinningText component"
+  ]
+}
