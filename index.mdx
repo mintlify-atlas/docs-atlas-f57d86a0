@@ -1,97 +1,235 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Welcome to Eufrosine Documentation"
+mode: "custom"
 ---
 
-## Setting up
+<div className="relative min-h-[500px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-[#0db3fc] via-[#2E1AFF] to-[#004d99] dark:from-[#0f1117] dark:via-[#1a1d27] dark:to-[#0f1117]">
+  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
+  
+  <div className="relative z-10 flex flex-col items-center justify-center px-6 py-20 text-center">
+    <h1 className="mb-6 text-4xl font-bold text-white sm:text-5xl md:text-6xl lg:text-7xl">
+      Hydration Made Simple
+    </h1>
+    <p className="mx-auto mb-10 max-w-2xl text-base text-gray-100 sm:text-lg md:text-xl lg:text-2xl">
+      Build beautiful, responsive water company websites with Next.js. Complete documentation for the Eufrosine premium table water platform.
+    </p>
+    <div className="flex flex-wrap items-center justify-center gap-4">
+      <a 
+        href="/quickstart" 
+        className="rounded-full bg-white px-8 py-4 text-base font-semibold text-[#2E1AFF] transition-colors hover:bg-gray-100 dark:bg-white dark:text-[#2E1AFF] dark:hover:bg-gray-200"
+      >
+        Get Started
+      </a>
+      <a 
+        href="/components/overview" 
+        className="rounded-full border border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 dark:border-white/30 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
+      >
+        Explore Components
+      </a>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
+    Quick Start
+  </h2>
+  <p className="mb-8 text-base text-gray-600 dark:text-gray-400">
+    Get your Eufrosine website up and running in minutes
+  </p>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+  <Steps>
+    <Step title="Clone the repository">
+      Clone the Eufrosine project repository to your local machine:
+      
+      ```bash
+      git clone https://github.com/JoseSanchez90/proyecto-eufrosine.git
+      cd proyecto-eufrosine
+      ```
+    </Step>
+    
+    <Step title="Install dependencies">
+      Install all required packages using npm:
+      
+      ```bash
+      npm install
+      ```
+      
+      <Note>
+        This project uses Next.js 16 with React 19 and requires Node.js 18 or higher.
+      </Note>
+    </Step>
+    
+    <Step title="Configure environment variables">
+      Create a `.env.local` file with your email credentials for the contact form:
+      
+      ```bash
+      EMAIL_USER=your-email@gmail.com
+      EMAIL_PASSWORD=your-app-password
+      ```
+    </Step>
+    
+    <Step title="Start development server">
+      Run the development server and open your browser:
+      
+      ```bash
+      npm run dev
+      ```
+      
+      Navigate to `http://localhost:3000` to see your site in action.
+    </Step>
+  </Steps>
+</div>
 
-## Make it yours
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
+    Key Features
+  </h2>
+  <p className="mb-8 text-base text-gray-600 dark:text-gray-400">
+    Everything you need to build a premium water company website
+  </p>
 
-Design a docs site that looks great and empowers your users.
+  <CardGroup cols={2}>
+    <Card title="Smooth Animations" icon="sparkles" href="/features/animations">
+      Framer Motion and GSAP powered animations for engaging user experiences
+    </Card>
+    <Card title="Contact Forms" icon="envelope" href="/features/contact-form">
+      Nodemailer integration for seamless customer communication
+    </Card>
+    <Card title="Product Carousels" icon="images" href="/features/carousels">
+      Embla-powered carousels for showcasing products and special offers
+    </Card>
+    <Card title="Smooth Scrolling" icon="up-down" href="/features/smooth-scroll">
+      Lenis smooth scroll for buttery navigation experiences
+    </Card>
+    <Card title="UI Components" icon="cubes" href="/components/ui-components">
+      Custom-built badge, card, and label components with shadcn/ui
+    </Card>
+    <Card title="Responsive Design" icon="mobile" href="/features/overview">
+      Mobile-first Tailwind CSS styling that works on all devices
+    </Card>
+  </CardGroup>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
+    Explore by Topic
+  </h2>
+  <p className="mb-8 text-base text-gray-600 dark:text-gray-400">
+    Dive deep into specific areas of the Eufrosine platform
+  </p>
 
-## Create beautiful pages
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <a
+      href="/components/navbar"
+      className="group block rounded-2xl border border-gray-200 overflow-hidden no-underline transition-colors hover:border-[#0db3fc] dark:border-[#27272a] dark:hover:border-[#0db3fc]"
+    >
+      <div className="h-48 overflow-hidden bg-gradient-to-br from-[#0db3fc]/20 to-[#2E1AFF]/20 flex items-center justify-center dark:from-[#1a1d27] dark:to-[#242838]">
+        <div className="text-6xl">🧭</div>
+      </div>
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <h3 className="mb-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+          Navigation Component
+        </h3>
+        <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">
+          Learn how to customize the navbar with menu items, logo, and mobile responsiveness
+        </p>
+        <div className="flex items-center text-sm font-medium text-[#0db3fc] transition-colors group-hover:text-[#0db3fc]">
+          View documentation
+          <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </a>
 
-Everything you need to create world-class documentation.
+    <a
+      href="/components/hero"
+      className="group block rounded-2xl border border-gray-200 overflow-hidden no-underline transition-colors hover:border-[#0db3fc] dark:border-[#27272a] dark:hover:border-[#0db3fc]"
+    >
+      <div className="h-48 overflow-hidden bg-gradient-to-br from-[#cbe8fc]/40 to-[#f4fcfc]/40 flex items-center justify-center dark:from-[#1a1d27] dark:to-[#242838]">
+        <div className="text-6xl">🎬</div>
+      </div>
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <h3 className="mb-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+          Hero Section
+        </h3>
+        <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">
+          Create stunning hero sections with video backgrounds and call-to-action buttons
+        </p>
+        <div className="flex items-center text-sm font-medium text-[#0db3fc] transition-colors group-hover:text-[#0db3fc]">
+          View documentation
+          <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </a>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+    <a
+      href="/api/contact"
+      className="group block rounded-2xl border border-gray-200 overflow-hidden no-underline transition-colors hover:border-[#0db3fc] dark:border-[#27272a] dark:hover:border-[#0db3fc]"
+    >
+      <div className="h-48 overflow-hidden bg-gradient-to-br from-[#0db3fc]/30 to-[#cbe8fc]/30 flex items-center justify-center dark:from-[#1a1d27] dark:to-[#242838]">
+        <div className="text-6xl">📧</div>
+      </div>
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <h3 className="mb-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+          Contact API
+        </h3>
+        <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">
+          Integrate email sending functionality with nodemailer for customer inquiries
+        </p>
+        <div className="flex items-center text-sm font-medium text-[#0db3fc] transition-colors group-hover:text-[#0db3fc]">
+          View API reference
+          <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </a>
 
-## Need inspiration?
+    <a
+      href="/deployment/vercel"
+      className="group block rounded-2xl border border-gray-200 overflow-hidden no-underline transition-colors hover:border-[#0db3fc] dark:border-[#27272a] dark:hover:border-[#0db3fc]"
+    >
+      <div className="h-48 overflow-hidden bg-gradient-to-br from-[#f4fcfc]/60 to-[#cbe8fc]/60 flex items-center justify-center dark:from-[#1a1d27] dark:to-[#242838]">
+        <div className="text-6xl">🚀</div>
+      </div>
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <h3 className="mb-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+          Deploy to Vercel
+        </h3>
+        <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">
+          Learn how to deploy your Eufrosine website to production with Vercel
+        </p>
+        <div className="flex items-center text-sm font-medium text-[#0db3fc] transition-colors group-hover:text-[#0db3fc]">
+          View deployment guide
+          <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="rounded-3xl border border-gray-200 bg-white p-8 dark:border-[#27272a] dark:bg-[#1a1d27] md:p-12">
+    <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
+      Ready to Build Your Water Company Website?
+    </h2>
+    <p className="mb-8 text-base text-gray-600 dark:text-gray-400 md:text-lg">
+      Start building with Eufrosine's Next.js template. Follow our quickstart guide to get your premium water company website live in minutes.
+    </p>
+    <a
+      href="/quickstart"
+      className="inline-flex items-center rounded-full bg-[#0db3fc] px-8 py-4 text-base font-semibold text-white transition-colors hover:bg-[#2E1AFF] dark:bg-[#0db3fc] dark:hover:bg-[#2E1AFF]"
+    >
+      Get Started Now
+      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+      </svg>
+    </a>
+  </div>
+</div>

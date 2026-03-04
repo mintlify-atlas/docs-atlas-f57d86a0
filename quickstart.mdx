@@ -1,80 +1,379 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start Guide
+description: Get Eufrosine running locally in under 5 minutes with this fast-track setup guide
 ---
 
-## Get started in three steps
+# Quick Start Guide
 
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+Get the Eufrosine website up and running on your local machine in just a few minutes. This guide assumes you have basic familiarity with Node.js and Git.
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  **Prerequisites**: You need Node.js 20+ and npm installed on your machine. Check your versions with `node --version` and `npm --version`.
+</Note>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Clone the Repository">
+    First, clone the Eufrosine repository to your local machine:
+
+    ```bash
+    git clone https://github.com/yourusername/proyecto-eufrosine.git
+    cd proyecto-eufrosine
+    ```
+
+    <Note>
+      Replace `yourusername` with the actual repository owner's username.
+    </Note>
+  </Step>
+
+  <Step title="Install Dependencies">
+    Install all required npm packages:
+
+    ```bash
+    npm install
+    ```
+
+    This will install all dependencies listed in `package.json`, including:
+    - Next.js 16.0.10
+    - React 19.2.0
+    - Framer Motion, GSAP, and Lenis for animations
+    - Tailwind CSS 4 for styling
+    - Nodemailer for email functionality
+
+    <Warning>
+      If you encounter peer dependency warnings, you can safely ignore them or use `npm install --legacy-peer-deps` if needed.
+    </Warning>
+  </Step>
+
+  <Step title="Configure Environment Variables">
+    Create a `.env.local` file in the root directory for email configuration:
+
+    ```bash
+    touch .env.local
+    ```
+
+    Add your email credentials for the contact form:
+
+    ```bash .env.local
+    # Email Configuration (for Nodemailer)
+    EMAIL_USER=your-email@gmail.com
+    EMAIL_PASS=your-app-password
+    EMAIL_TO=aguademesaeufrosineperu@gmail.com
+    ```
+
+    <Note>
+      **Gmail Users**: Use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password for security.
+    </Note>
+
+    <Accordion title="Other email providers">
+      For other email providers, you'll need to configure the SMTP settings in `/app/api/contact/route.ts`:
+
+      ```typescript
+      const transporter = nodemailer.createTransport({
+        host: "smtp.yourdomain.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+      ```
+    </Accordion>
+  </Step>
+
+  <Step title="Start the Development Server">
+    Run the development server:
+
+    ```bash
+    npm run dev
+    ```
+
+    The site will start on [http://localhost:3000](http://localhost:3000)
+
+    <Check>
+      You should see the Eufrosine homepage with the hero video and smooth scrolling!
+    </Check>
+  </Step>
+
+  <Step title="Verify Everything Works">
+    Test these key features to ensure proper setup:
+
+    **Navigation**
+    - Click on navbar links to test smooth scrolling
+    - Test the mobile menu on smaller screens
+
+    **Carousels**
+    - Scroll to "Nuestras Presentaciones" section
+    - Swipe through the product carousel
+    - Check the "Ofertas Especiales" carousel
+
+    **Contact Form** (optional if you configured email)
+    - Scroll to the "Contáctanos" section
+    - Fill out and submit the form
+    - Check for success/error alerts
+
+    <Warning>
+      If the contact form doesn't work, ensure your `.env.local` file is configured correctly and the email credentials are valid.
+    </Warning>
+  </Step>
+</Steps>
+
+## Development Commands
+
+Here are the main commands you'll use during development:
+
+<CodeGroup>
+
+```bash Development
+# Start development server with hot reload
+npm run dev
+
+# Development server runs on http://localhost:3000
+# Changes auto-reload thanks to Fast Refresh
+```
+
+```bash Build
+# Create optimized production build
+npm run build
+
+# This generates static HTML and optimized assets
+# Build output goes to .next/ directory
+```
+
+```bash Production
+# Start production server (after build)
+npm run start
+
+# Runs the production build on http://localhost:3000
+```
+
+</CodeGroup>
+
+## File Structure Overview
+
+Once you have the project running, here's what you'll be working with:
+
+```plaintext
+proyecto-eufrosine/
+├── app/
+│   ├── api/                    # API Routes
+│   │   ├── contact/route.ts    # Contact form endpoint
+│   │   └── complaint/route.ts  # Complaint book endpoint
+│   ├── layout.tsx              # Root layout (metadata, fonts)
+│   ├── page.tsx                # Home page (main content)
+│   └── globals.css             # Global styles
+│
+├── components/
+│   ├── ui/                     # Reusable UI components
+│   │   ├── badge.tsx
+│   │   ├── card.tsx
+│   │   ├── label.tsx
+│   │   └── glowing-effect.tsx
+│   ├── navbar.tsx              # Navigation bar
+│   ├── productsCarousel.tsx    # Product presentations
+│   ├── offersCarousel.tsx      # Special offers
+│   ├── process.tsx             # Purification process
+│   ├── lenisSmoothScroll.tsx   # Smooth scroll setup
+│   └── optimized-video.tsx     # Hero video component
+│
+├── lib/
+│   ├── fonts.ts                # Font configurations
+│   └── utils.ts                # Helper functions
+│
+├── public/
+│   ├── img/                    # Images and logos
+│   └── svg/                    # SVG icons
+│
+├── .env.local                  # Environment variables (create this)
+├── package.json                # Dependencies
+├── next.config.ts              # Next.js configuration
+├── tailwind.config.ts          # Tailwind CSS config
+└── tsconfig.json               # TypeScript config
+```
+
+## Common Development Tasks
+
+### Editing Content
+
+The main content is in `/app/page.tsx`. Here's how to edit common sections:
+
+<CodeGroup>
+
+```tsx Hero Section
+// app/page.tsx (lines 171-210)
+<section id="inicio" className="relative h-screen">
+  <OptimizedVideo />
+  <div className="absolute h-full inset-0 bg-black/50 -z-10" />
+  
+  <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+    <h1 className="text-4xl 2xl:text-7xl mb-8 text-white font-bold">
+      Hidratación Pura, Vida Sana
+    </h1>
+    <p className="max-w-4xl text-lg md:text-2xl text-gray-200 mb-8">
+      Eufrosine te ofrece agua purificada de la más alta calidad...
+    </p>
+  </div>
+</section>
+```
+
+```tsx Company Values
+// app/page.tsx (lines 20-58)
+const Valores = [
+  {
+    Icon: <img src="/svg/fluent-color--ribbon-star-20.svg" alt="Mision" />,
+    title: "Nuestra Misión",
+    description: "Proporcionar agua de la más alta calidad...",
+  },
+  {
+    Icon: <img src="/svg/fluent-color--lightbulb-filament-20.svg" alt="Vision" />,
+    title: "Nuestra Visión",
+    description: "Ser la empresa de agua de mesa más reconocida...",
+  },
+  // Add more values here
+];
+```
+
+```tsx Contact Information
+// app/layout.tsx (lines 19-38)
+const companyData = {
+  name: "Eufrosine - Agua de Mesa",
+  description: "Descubre nuestra agua de mesa premium...",
+  url: "https://eufrosine.vercel.app/",
+  logo: "/img/Logo-Eufrosine-transparent.png",
+  phone: "+51903565918",
+  email: "aguademesaeufrosineperu@gmail.com",
+  address: {
+    street: "Hualmay",
+    city: "Huacho",
+    country: "Perú",
+  },
+  social: {
+    facebook: "https://www.facebook.com/aguaeufrosine",
+    instagram: "https://www.instagram.com/aguaeufrosine/",
+    whatsapp: "https://wa.me/51903565918",
+  },
+};
+```
+
+</CodeGroup>
+
+### Customizing Colors
+
+The brand colors are used throughout the codebase:
+
+```css
+/* Primary Blue */
+#1F01B9  /* Main brand color - used for buttons, headings */
+#391FB6  /* Hover state */
+
+/* Accent Blue */
+#0db3fc  /* Light cyan - for highlights */
+#00A3FF  /* Theme color */
+```
+
+Find and replace these hex codes to rebrand the site.
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Installation Details" icon="gear" href="/installation">
+    Learn about system requirements and detailed setup
+  </Card>
+  
+  <Card title="Components" icon="cube" href="/components/overview">
+    Explore the UI component library
+  </Card>
+  
+  <Card title="API Routes" icon="code" href="/api/contact">
+    Understand the backend endpoints
+  </Card>
+  
+  <Card title="Deployment" icon="rocket" href="/deployment/vercel">
+    Deploy to Vercel or other platforms
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port 3000 is already in use">
+    If port 3000 is occupied, you can specify a different port:
+
+    ```bash
+    npm run dev -- -p 3001
+    ```
+
+    Or kill the process using port 3000:
+
+    ```bash
+    # On macOS/Linux
+    lsof -ti:3000 | xargs kill -9
+
+    # On Windows
+    netstat -ano | findstr :3000
+    taskkill /PID <PID> /F
+    ```
+  </Accordion>
+
+  <Accordion title="Module not found errors">
+    If you see "Cannot find module" errors:
+
+    1. Delete `node_modules` and lock file:
+       ```bash
+       rm -rf node_modules package-lock.json
+       ```
+
+    2. Reinstall dependencies:
+       ```bash
+       npm install
+       ```
+
+    3. Restart the dev server
+  </Accordion>
+
+  <Accordion title="Smooth scrolling not working">
+    The Lenis smooth scroll requires JavaScript to be enabled. Check:
+
+    1. Browser console for JavaScript errors
+    2. That the `<LenisSmoothScroll />` component is rendered in `layout.tsx`
+    3. Clear browser cache and hard reload (Ctrl+Shift+R)
+  </Accordion>
+
+  <Accordion title="Images not loading">
+    Images are served from the `/public` directory. Ensure:
+
+    1. Images exist in `/public/img/` directory
+    2. File paths in code match actual file names (case-sensitive)
+    3. Image files are not corrupted
+
+    Example:
+    ```tsx
+    // Correct: /public/img/logo.png
+    <img src="/img/logo.png" alt="Logo" />
+
+    // Wrong: missing /public prefix
+    <img src="public/img/logo.png" alt="Logo" />
+    ```
+  </Accordion>
+
+  <Accordion title="Contact form not sending emails">
+    Email issues are usually related to environment variables:
+
+    1. Verify `.env.local` exists and has correct credentials
+    2. For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833)
+    3. Check the browser console and terminal for error messages
+    4. Test with a simple curl request to `/api/contact`
+
+    ```bash
+    curl -X POST http://localhost:3000/api/contact \
+      -H "Content-Type: application/json" \
+      -d '{"name":"Test","email":"test@example.com","message":"Test message"}'
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  **Need more help?** Check the detailed [Installation Guide](/installation) or open an issue on GitHub.
 </Note>

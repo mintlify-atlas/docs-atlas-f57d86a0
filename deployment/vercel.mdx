@@ -1,0 +1,422 @@
+---
+title: "Vercel Deployment"
+description: "Step-by-step guide to deploy the Eufrosine Next.js application on Vercel"
+---
+
+## Overview
+
+Vercel is the recommended platform for deploying the Eufrosine project. As the creators of Next.js, Vercel provides optimal performance and seamless integration with Next.js 16 features.
+
+## Prerequisites
+
+Before deploying, ensure you have:
+
+- A [Vercel account](https://vercel.com/signup)
+- Git repository with the Eufrosine project
+- Gmail app password for email functionality (see [Environment Variables](/deployment/environment))
+- Vercel CLI installed (optional, for CLI deployment)
+
+## Deployment Methods
+
+### Method 1: Deploy via Vercel Dashboard (Recommended)
+
+<Steps>
+  <Step title="Import Project">
+    1. Log in to [Vercel Dashboard](https://vercel.com/dashboard)
+    2. Click "Add New" → "Project"
+    3. Import your Git repository (GitHub, GitLab, or Bitbucket)
+    4. Select the repository containing the Eufrosine project
+  </Step>
+
+  <Step title="Configure Project">
+    Vercel will automatically detect Next.js configuration. Verify these settings:
+    
+    - **Framework Preset**: Next.js
+    - **Root Directory**: `./` (or specify if in a monorepo)
+    - **Build Command**: `npm run build` (auto-detected from `package.json:7`)
+    - **Output Directory**: `.next` (auto-detected)
+    - **Install Command**: `npm install` (auto-detected)
+    
+    <Warning>
+      The project uses webpack bundler via the `--webpack` flag. This is automatically handled by Vercel based on the build script.
+    </Warning>
+  </Step>
+
+  <Step title="Add Environment Variables">
+    In the "Environment Variables" section, add the required variables:
+    
+    **EMAIL_USER**:
+    - **Key**: `EMAIL_USER`
+    - **Value**: Your Gmail address (e.g., `your-email@gmail.com`)
+    - **Environment**: Production, Preview, Development (select all)
+    
+    **EMAIL_PASSWORD**:
+    - **Key**: `EMAIL_PASSWORD`
+    - **Value**: Your Gmail app password
+    - **Environment**: Production, Preview, Development (select all)
+    
+    <Warning>
+      These variables are required for the contact form (`/api/contact`) and complaint form (`/api/complaint`) to function. Without them, API routes will fail with "Missing email credentials" error.
+    </Warning>
+    
+    See the [Environment Variables](/deployment/environment) guide for detailed setup instructions.
+  </Step>
+
+  <Step title="Deploy">
+    Click "Deploy" to start the deployment process.
+    
+    Vercel will:
+    1. Clone your repository
+    2. Install dependencies (`npm install`)
+    3. Build the project (`npm run build`)
+    4. Deploy to global edge network
+    
+    The initial deployment typically takes 2-3 minutes.
+  </Step>
+
+  <Step title="Verify Deployment">
+    After deployment completes:
+    
+    1. Click the deployment URL provided by Vercel
+    2. Test the contact form to verify email functionality
+    3. Test the complaint form (Libro de Reclamaciones)
+    4. Check for any console errors in browser DevTools
+    
+    Your application is now live!
+  </Step>
+</Steps>
+
+### Method 2: Deploy via Vercel CLI
+
+<Steps>
+  <Step title="Install Vercel CLI">
+    Install the Vercel CLI globally:
+    
+    ```bash
+    npm install -g vercel
+    ```
+  </Step>
+
+  <Step title="Login to Vercel">
+    Authenticate with your Vercel account:
+    
+    ```bash
+    vercel login
+    ```
+  </Step>
+
+  <Step title="Configure Environment Variables">
+    Create environment variables using the CLI:
+    
+    ```bash
+    vercel env add EMAIL_USER
+    ```
+    
+    When prompted:
+    - Enter your Gmail address
+    - Select environments: Production, Preview, Development
+    
+    ```bash
+    vercel env add EMAIL_PASSWORD
+    ```
+    
+    When prompted:
+    - Enter your Gmail app password
+    - Select environments: Production, Preview, Development
+  </Step>
+
+  <Step title="Deploy">
+    From the project root directory, run:
+    
+    ```bash
+    vercel
+    ```
+    
+    For production deployment:
+    
+    ```bash
+    vercel --prod
+    ```
+    
+    Follow the prompts to configure your project.
+  </Step>
+</Steps>
+
+## Project-Specific Configuration
+
+### Next.js Version
+
+The project uses **Next.js 16.0.10** (`package.json:23`), which is fully supported by Vercel.
+
+### API Routes
+
+The application includes two serverless API routes that will be automatically deployed:
+
+1. **Contact Form API** (`/api/contact`)
+   - File: `app/api/contact/route.ts`
+   - Purpose: Handles contact form submissions
+   - Dependencies: nodemailer, Gmail SMTP
+
+2. **Complaint Form API** (`/api/complaint`)
+   - File: `app/api/complaint/route.ts`
+   - Purpose: Handles complaint book (Libro de Reclamaciones) submissions
+   - Dependencies: nodemailer, Gmail SMTP
+
+Both routes are deployed as serverless functions with automatic scaling.
+
+### Build Configuration
+
+The project uses:
+
+- **Bundler**: Webpack (specified via `--webpack` flag)
+- **React Version**: 19.2.0
+- **TypeScript**: Yes
+- **PostCSS**: Tailwind CSS 4 via `@tailwindcss/postcss`
+
+### Key Dependencies
+
+Vercel automatically handles these production dependencies:
+
+- **Animation**: Framer Motion, GSAP, Lenis
+- **Email**: Nodemailer 7.0.10
+- **UI Components**: Radix UI, Lucide React
+- **Styling**: Tailwind CSS 4
+- **Carousels**: Embla Carousel
+
+## Custom Domain Configuration
+
+<Steps>
+  <Step title="Add Domain">
+    In your Vercel project:
+    
+    1. Go to Settings → Domains
+    2. Click "Add"
+    3. Enter your custom domain (e.g., `eufrosine.com`)
+  </Step>
+
+  <Step title="Configure DNS">
+    Add these DNS records to your domain registrar:
+    
+    **For apex domain** (`eufrosine.com`):
+    ```
+    A     @     76.76.21.21
+    ```
+    
+    **For www subdomain**:
+    ```
+    CNAME www   cname.vercel-dns.com
+    ```
+  </Step>
+
+  <Step title="Verify Domain">
+    Vercel will automatically:
+    - Verify domain ownership
+    - Provision SSL certificate
+    - Enable HTTPS
+    
+    DNS propagation can take up to 48 hours.
+  </Step>
+</Steps>
+
+## Continuous Deployment
+
+Vercel automatically deploys:
+
+- **Production**: Commits to your main/master branch
+- **Preview**: Pull requests and other branches
+
+### Git Integration
+
+Once connected, every push triggers:
+
+1. Automatic build
+2. Deployment to preview URL
+3. Comment on PR with preview link (for PRs)
+4. Production deployment (for main branch)
+
+### Deployment Hooks
+
+To trigger deployments programmatically:
+
+<Steps>
+  <Step title="Create Deploy Hook">
+    1. Go to Project Settings → Git
+    2. Scroll to "Deploy Hooks"
+    3. Click "Create Hook"
+    4. Name it (e.g., "Manual Deploy")
+    5. Select branch (e.g., `main`)
+    6. Copy the generated URL
+  </Step>
+
+  <Step title="Trigger Deployment">
+    Use the hook URL to trigger deployments:
+    
+    ```bash
+    curl -X POST https://api.vercel.com/v1/integrations/deploy/...
+    ```
+  </Step>
+</Steps>
+
+## Performance Optimization
+
+Vercel provides several performance features:
+
+### Edge Network
+
+- Automatic global CDN distribution
+- Smart routing to nearest edge location
+- Asset optimization and caching
+
+### Next.js Optimizations
+
+- **Static pages**: Pre-rendered at build time
+- **API routes**: Serverless functions with automatic scaling
+- **Image optimization**: Automatic via Next.js Image component
+- **Font optimization**: Automatic font loading optimization
+
+### Analytics
+
+Enable Vercel Analytics:
+
+1. Go to Project Settings → Analytics
+2. Enable Web Analytics
+3. Add the analytics script to your project (optional for Next.js)
+
+## Monitoring and Logs
+
+### View Deployment Logs
+
+1. Go to your project dashboard
+2. Click on a deployment
+3. View build logs and runtime logs
+
+### Serverless Function Logs
+
+View API route logs:
+
+1. Go to deployment details
+2. Click "Functions" tab
+3. Select the function (`/api/contact` or `/api/complaint`)
+4. View real-time logs
+
+<Warning>
+  Email credentials validation errors will appear in function logs. Check logs if email sending fails.
+</Warning>
+
+## Troubleshooting
+
+### Build Fails
+
+**Check build logs** in the Vercel dashboard for specific errors.
+
+Common issues:
+
+1. **TypeScript errors**: Fix type errors in your code
+2. **Missing dependencies**: Ensure all dependencies are in `package.json`
+3. **Environment variables**: Verify variables are set correctly
+
+### API Routes Return 500 Error
+
+**Cause**: Missing environment variables or email authentication failure
+
+**Solution**:
+
+1. Verify `EMAIL_USER` and `EMAIL_PASSWORD` are set in Vercel
+2. Check function logs for specific error messages
+3. Verify Gmail app password is correct
+4. Redeploy after updating environment variables
+
+### Email Not Sending
+
+**Debugging steps**:
+
+<Steps>
+  <Step title="Check Function Logs">
+    View logs for `/api/contact` or `/api/complaint` functions to see nodemailer errors
+  </Step>
+
+  <Step title="Verify Credentials">
+    Test credentials locally first:
+    
+    ```bash
+    npm run dev
+    ```
+    
+    Submit a test form and check console output
+  </Step>
+
+  <Step title="Check Gmail Account">
+    1. Verify 2FA is enabled
+    2. Verify app password is valid
+    3. Check for security alerts in Gmail
+  </Step>
+</Steps>
+
+### Deployment Timeout
+
+**Cause**: Build taking too long (>15 minutes on free plan)
+
+**Solution**:
+
+1. Check for infinite loops in build process
+2. Optimize dependencies
+3. Upgrade to Pro plan for longer build times
+
+## Environment-Specific Settings
+
+### Preview Deployments
+
+Test changes before production:
+
+1. Create a branch or PR
+2. Push changes
+3. Vercel automatically creates preview deployment
+4. Test using preview URL
+
+### Production Deployments
+
+For production deploys:
+
+1. Merge to main branch
+2. Vercel automatically deploys to production
+3. Previous deployment remains accessible
+4. Instant rollback available
+
+## Rollback
+
+To rollback to a previous deployment:
+
+<Steps>
+  <Step title="Access Deployments">
+    Go to your project and click "Deployments" tab
+  </Step>
+
+  <Step title="Select Deployment">
+    Find the deployment you want to rollback to
+  </Step>
+
+  <Step title="Promote to Production">
+    Click the three dots (⋯) → "Promote to Production"
+  </Step>
+</Steps>
+
+Rollback is instant with zero downtime.
+
+## Best Practices
+
+- Enable preview deployments for all branches
+- Test environment variables in preview before production
+- Monitor function logs regularly
+- Set up custom domain with SSL
+- Enable Vercel Analytics for performance insights
+- Use deployment protection for production deployments
+- Keep Next.js and dependencies updated
+- Implement error boundaries in React components
+- Add rate limiting to API routes to prevent abuse
+
+## Support and Resources
+
+- [Vercel Documentation](https://vercel.com/docs)
+- [Next.js Deployment Docs](https://nextjs.org/docs/deployment)
+- [Vercel Community](https://github.com/vercel/vercel/discussions)
+- [Vercel Status Page](https://www.vercel-status.com/)

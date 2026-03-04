@@ -1,0 +1,582 @@
+---
+title: Smooth Scroll
+description: Implementing Lenis smooth scroll for an enhanced scrolling experience
+---
+
+# Smooth Scroll
+
+Eufrosine uses **Lenis** by Studio Freight to provide a smooth, physics-based scrolling experience. Lenis creates natural, momentum-based scrolling with customizable easing and inertia.
+
+## Why Lenis?
+
+<CardGroup cols={2}>
+  <Card title="Smooth & Natural" icon="wave-pulse">
+    Physics-based scrolling with momentum and inertia
+  </Card>
+  <Card title="Performant" icon="rocket">
+    Optimized with requestAnimationFrame for 60fps
+  </Card>
+  <Card title="Customizable" icon="sliders">
+    Configurable duration, lerp, and easing functions
+  </Card>
+  <Card title="Lightweight" icon="feather">
+    Minimal bundle size with no dependencies
+  </Card>
+</CardGroup>
+
+---
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install @studio-freight/lenis
+```
+
+```bash yarn
+yarn add @studio-freight/lenis
+```
+
+```bash pnpm
+pnpm add @studio-freight/lenis
+```
+</CodeGroup>
+
+**Current Version:** `@studio-freight/lenis@1.0.42`
+
+---
+
+## Implementation
+
+### Basic Setup
+
+<Tabs>
+  <Tab title="Component">
+    ```tsx components/lenisSmoothScroll.tsx
+    "use client";
+    import { useEffect } from "react";
+    import Lenis from "@studio-freight/lenis";
+    
+    export default function LenisSmoothScroll() {
+      useEffect(() => {
+        const lenis = new Lenis({
+          duration: 1.2,        // Animation duration
+          lerp: 0.1,            // Linear interpolation intensity
+          smoothWheel: true,    // Enable smooth wheel scrolling
+          wheelMultiplier: 0.8, // Scroll speed for mouse wheel
+          touchMultiplier: 0.7, // Scroll speed for touch devices
+          easing: (t) => 1 - Math.pow(1 - t, 3), // Cubic easing
+        });
+    
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+    
+        return () => lenis.destroy();
+      }, []);
+    
+      return null;
+    }
+    ```
+  </Tab>
+  <Tab title="Usage">
+    Add the component to your root layout:
+    
+    ```tsx app/layout.tsx
+    import LenisSmoothScroll from "@/components/lenisSmoothScroll";
+    
+    export default function RootLayout({ children }) {
+      return (
+        <html lang="en">
+          <body>
+            <LenisSmoothScroll />
+            {children}
+          </body>
+        </html>
+      );
+    }
+    ```
+    
+    The component:
+    - Returns `null` (no visual rendering)
+    - Initializes once on mount
+    - Cleans up on unmount
+    - Runs in an infinite requestAnimationFrame loop
+  </Tab>
+</Tabs>
+
+---
+
+## Configuration Options
+
+### Core Parameters
+
+<Tabs>
+  <Tab title="duration">
+    ```typescript
+    duration: 1.2
+    ```
+    
+    **Controls:** Total animation time for smooth scroll
+    
+    **Range:** `0.1` - `3.0` seconds
+    
+    **Effect:**
+    - Lower = Snappier, faster scrolling
+    - Higher = Slower, more dramatic scrolling
+    
+    **Recommended:**
+    - Desktop: `1.2` - `1.5`
+    - Mobile: `0.8` - `1.0`
+  </Tab>
+  
+  <Tab title="lerp">
+    ```typescript
+    lerp: 0.1
+    ```
+    
+    **Controls:** Linear interpolation intensity (easing strength)
+    
+    **Range:** `0.01` - `1.0`
+    
+    **Effect:**
+    - Lower = More inertia, smooth momentum
+    - Higher = More responsive, less momentum
+    
+    **Recommended:**
+    - Smooth experience: `0.1`
+    - Snappy experience: `0.3` - `0.5`
+    
+    <Note>
+      `lerp: 1` disables smooth scrolling entirely
+    </Note>
+  </Tab>
+  
+  <Tab title="Multipliers">
+    ```typescript
+    wheelMultiplier: 0.8  // Mouse wheel
+    touchMultiplier: 0.7  // Touch devices
+    ```
+    
+    **Controls:** Scroll speed for different input methods
+    
+    **Range:** `0.1` - `3.0`
+    
+    **Effect:**
+    - Lower = Slower scrolling
+    - Higher = Faster scrolling
+    
+    **Best Practice:**
+    - Touch should be slightly slower than wheel
+    - Prevents jarring experience on mobile
+  </Tab>
+  
+  <Tab title="easing">
+    ```typescript
+    easing: (t) => 1 - Math.pow(1 - t, 3)
+    ```
+    
+    **Controls:** Easing function for scroll animation
+    
+    **Common Easing Functions:**
+    
+    ```typescript
+    // Ease Out Cubic (current)
+    (t) => 1 - Math.pow(1 - t, 3)
+    
+    // Ease In Out Cubic
+    (t) => t < 0.5
+      ? 4 * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 3) / 2
+    
+    // Ease Out Expo
+    (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+    
+    // Linear
+    (t) => t
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Advanced Configuration
+
+### Full Options Object
+
+```typescript components/lenisSmoothScroll.tsx
+const lenis = new Lenis({
+  // Core scrolling
+  duration: 1.2,
+  lerp: 0.1,
+  smoothWheel: true,
+  
+  // Input multipliers
+  wheelMultiplier: 0.8,
+  touchMultiplier: 0.7,
+  
+  // Scrollbar behavior
+  syncTouch: false,        // Sync touch input (can cause issues)
+  touchInertiaMultiplier: 35, // Touch momentum strength
+  
+  // Direction
+  direction: 'vertical',   // 'vertical' | 'horizontal'
+  gestureDirection: 'vertical', // 'vertical' | 'horizontal' | 'both'
+  
+  // Boundaries
+  infinite: false,         // Infinite scroll
+  
+  // Easing
+  easing: (t) => 1 - Math.pow(1 - t, 3),
+});
+```
+
+<Warning>
+  Setting `syncTouch: true` can cause performance issues on iOS devices. Keep it `false` for better mobile experience.
+</Warning>
+
+---
+
+## Programmatic Scrolling
+
+### Scroll to Element
+
+Eufrosine implements smooth scrolling to sections:
+
+```tsx app/page.tsx
+const scrollToSection = (id: string) => {
+  const section = document.getElementById(id);
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
+// Usage
+<button onClick={() => scrollToSection("contactanos")}>
+  Contact Us
+</button>
+```
+
+### Scroll with Lenis API
+
+For more control, use the Lenis API directly:
+
+```typescript
+import Lenis from "@studio-freight/lenis";
+
+// Create a ref to store lenis instance
+const lenisRef = useRef<Lenis | null>(null);
+
+useEffect(() => {
+  lenisRef.current = new Lenis({
+    duration: 1.2,
+    lerp: 0.1,
+  });
+  
+  // ... raf loop
+}, []);
+
+// Scroll to specific position
+const scrollTo = (target: number | string) => {
+  lenisRef.current?.scrollTo(target, {
+    offset: 0,
+    duration: 2,
+    easing: (t) => t,
+  });
+};
+
+// Examples
+scrollTo(1000);              // Scroll to 1000px
+scrollTo("#section-id");     // Scroll to element
+scrollTo("#section-id", {    // With options
+  offset: -100,              // 100px before target
+  duration: 1.5,
+});
+```
+
+---
+
+## Integration with Animations
+
+### Scroll-Triggered Animations
+
+Combine Lenis with GSAP ScrollTrigger:
+
+```tsx
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "@studio-freight/lenis";
+
+gsap.registerPlugin(ScrollTrigger);
+
+useEffect(() => {
+  const lenis = new Lenis();
+  
+  // Connect Lenis to ScrollTrigger
+  lenis.on('scroll', ScrollTrigger.update);
+  
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000);
+  });
+  
+  gsap.ticker.lagSmoothing(0);
+  
+  // Now you can use ScrollTrigger
+  gsap.from(".fade-in", {
+    scrollTrigger: {
+      trigger: ".fade-in",
+      start: "top 80%",
+      end: "bottom 20%",
+      scrub: true,
+    },
+    opacity: 0,
+    y: 100,
+  });
+  
+  return () => {
+    lenis.destroy();
+  };
+}, []);
+```
+
+---
+
+## Performance Optimization
+
+### RequestAnimationFrame Loop
+
+Lenis uses RAF for optimal performance:
+
+```typescript
+function raf(time: number) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+```
+
+<Note>
+  This creates a self-sustaining animation loop that runs at 60fps (or the display's refresh rate).
+</Note>
+
+### Memory Management
+
+```typescript
+useEffect(() => {
+  const lenis = new Lenis({ /* ... */ });
+  
+  // RAF loop setup
+  
+  // Cleanup on unmount
+  return () => lenis.destroy();
+}, []);
+```
+
+**Important:** Always call `lenis.destroy()` to:
+- Remove event listeners
+- Cancel animation frame
+- Prevent memory leaks
+
+---
+
+## Mobile Considerations
+
+<Tabs>
+  <Tab title="Touch Devices">
+    ### Touch-Specific Settings
+    
+    ```typescript
+    const lenis = new Lenis({
+      touchMultiplier: 0.7,  // Slower than desktop
+      syncTouch: false,      // Better iOS compatibility
+      touchInertiaMultiplier: 35, // Natural momentum
+    });
+    ```
+    
+    ### iOS Safari
+    
+    Add to your CSS:
+    ```css
+    body {
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Responsive Config">
+    ### Device-Specific Configuration
+    
+    ```typescript
+    const isMobile = window.innerWidth < 768;
+    
+    const lenis = new Lenis({
+      duration: isMobile ? 0.8 : 1.2,
+      lerp: isMobile ? 0.15 : 0.1,
+      wheelMultiplier: isMobile ? 0.6 : 0.8,
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Accessibility
+
+<Warning>
+  **Important Accessibility Considerations:**
+</Warning>
+
+### Respect User Preferences
+
+```typescript
+const prefersReducedMotion = window.matchMedia(
+  '(prefers-reduced-motion: reduce)'
+).matches;
+
+const lenis = new Lenis({
+  duration: prefersReducedMotion ? 0 : 1.2,
+  lerp: prefersReducedMotion ? 1 : 0.1,
+});
+```
+
+### Keyboard Navigation
+
+Lenis automatically supports:
+- `Space` / `Shift+Space` - Page up/down
+- `Arrow Up` / `Arrow Down` - Line scrolling
+- `Home` / `End` - Top/bottom
+- `Page Up` / `Page Down` - Page scrolling
+
+---
+
+## Troubleshooting
+
+<Accordion title="Scroll not working">
+  1. Check that the component is mounted
+  2. Verify RAF loop is running
+  3. Check for CSS `overflow: hidden` on body
+  4. Ensure content is taller than viewport
+  5. Check browser console for errors
+</Accordion>
+
+<Accordion title="Choppy scrolling">
+  1. Reduce `lerp` value for more momentum
+  2. Increase `duration` for slower animation
+  3. Check for heavy JavaScript on scroll
+  4. Profile with browser DevTools
+  5. Consider reducing `wheelMultiplier`
+</Accordion>
+
+<Accordion title="iOS scroll issues">
+  1. Set `syncTouch: false`
+  2. Add `-webkit-overflow-scrolling: touch` CSS
+  3. Add `overscroll-behavior: none` CSS
+  4. Test on actual device, not simulator
+  5. Check for conflicting touch event handlers
+</Accordion>
+
+---
+
+## API Reference
+
+### Methods
+
+```typescript
+lenis.scrollTo(target, options)  // Scroll to target
+lenis.start()                    // Start scrolling
+lenis.stop()                     // Stop scrolling
+lenis.destroy()                  // Cleanup
+lenis.raf(time)                  // Update animation
+```
+
+### Events
+
+```typescript
+lenis.on('scroll', ({ scroll, limit, velocity, direction }) => {
+  console.log('Current scroll:', scroll);
+});
+```
+
+### Properties
+
+```typescript
+lenis.scroll     // Current scroll position
+lenis.limit      // Maximum scroll value
+lenis.velocity   // Current scroll velocity
+lenis.direction  // 1 for down, -1 for up
+```
+
+---
+
+## Examples
+
+<Accordion title="Scroll Progress Indicator">
+  ```tsx
+  const [scrollProgress, setScrollProgress] = useState(0);
+  
+  useEffect(() => {
+    const lenis = new Lenis();
+    
+    lenis.on('scroll', ({ scroll, limit }) => {
+      setScrollProgress((scroll / limit) * 100);
+    });
+    
+    // RAF loop...
+  }, []);
+  
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: `${scrollProgress}%`,
+        height: '4px',
+        background: 'blue',
+      }}
+    />
+  );
+  ```
+</Accordion>
+
+<Accordion title="Scroll Direction Detection">
+  ```tsx
+  useEffect(() => {
+    const lenis = new Lenis();
+    
+    lenis.on('scroll', ({ direction, velocity }) => {
+      if (direction === 1) {
+        console.log('Scrolling down');
+      } else {
+        console.log('Scrolling up');
+      }
+      
+      console.log('Speed:', velocity);
+    });
+    
+    // RAF loop...
+  }, []);
+  ```
+</Accordion>
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Lenis GitHub" icon="github" href="https://github.com/studio-freight/lenis">
+    Official Lenis repository
+  </Card>
+  <Card title="Studio Freight" icon="link" href="https://www.studiofreight.com/">
+    Created by Studio Freight
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- [Animations →](/features/animations)
+- [Carousels →](/features/carousels)
+- [Contact Form →](/features/contact-form)

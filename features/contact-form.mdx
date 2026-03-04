@@ -1,0 +1,610 @@
+---
+title: Contact Form
+description: Implementing a contact form with Nodemailer email integration
+---
+
+# Contact Form
+
+Eufrosine features a fully functional contact form with server-side email delivery using **Nodemailer**. The form includes validation, loading states, and beautiful success/error notifications using SweetAlert2.
+
+## Features
+
+- ✅ Client-side form validation
+- ✅ Loading states with spinner
+- ✅ Email delivery via Gmail SMTP
+- ✅ SweetAlert2 notifications
+- ✅ Form reset after successful submission
+- ✅ Reply-to functionality
+- ✅ Environment variable configuration
+
+---
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install nodemailer sweetalert2 @types/nodemailer
+```
+
+```bash yarn
+yarn add nodemailer sweetalert2 @types/nodemailer
+```
+
+```bash pnpm
+pnpm add nodemailer sweetalert2 @types/nodemailer
+```
+</CodeGroup>
+
+---
+
+## Environment Configuration
+
+Create a `.env.local` file in your project root:
+
+```bash .env.local
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+```
+
+<Warning>
+  **Important:** Use an App Password, not your regular Gmail password.
+  
+  Generate one at: [Google Account Settings → Security → App passwords](https://myaccount.google.com/apppasswords)
+</Warning>
+
+<Note>
+  Never commit `.env.local` to version control. Add it to your `.gitignore` file.
+</Note>
+
+---
+
+## Implementation
+
+### 1. API Route Handler
+
+Create the API endpoint to handle form submissions:
+
+<Tabs>
+  <Tab title="app/api/contact/route.ts">
+    ```typescript app/api/contact/route.ts
+    import { NextResponse } from "next/server";
+    import nodemailer from "nodemailer";
+    
+    export async function POST(req: Request) {
+      try {
+        const { name, email, phone, message } = await req.json();
+    
+        // Verify environment variables
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+          throw new Error("Missing email credentials");
+        }
+    
+        // Create transporter
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD,
+          },
+        });
+    
+        // Send email
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: "aguademesaeufrosineperu@gmail.com",
+          subject: `Has recibido un mensaje desde tu Web Eufrosine`,
+          text: `Cliente: ${name}\nCelular: ${phone}\nEmail: ${email}\nMensaje: ${message}`,
+          replyTo: email,
+        });
+    
+        return NextResponse.json({ success: true });
+      } catch (error) {
+        console.error("Error sending email:", error);
+        return NextResponse.json(
+          { error: "Error sending email" },
+          { status: 500 }
+        );
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Explanation">
+    **Key Components:**
+    
+    1. **Environment Check**: Validates credentials are configured
+    2. **Transporter**: Creates Gmail SMTP connection
+    3. **Email Sending**: Uses `sendMail()` with:
+       - `from`: Your email address
+       - `to`: Recipient email
+       - `subject`: Email subject line
+       - `text`: Plain text email body
+       - `replyTo`: User's email for easy responses
+    4. **Error Handling**: Returns appropriate status codes
+  </Tab>
+</Tabs>
+
+---
+
+### 2. Contact Form Component
+
+The client-side form implementation:
+
+<Tabs>
+  <Tab title="Form Component">
+    ```tsx app/page.tsx
+    "use client";
+    
+    import { useState } from "react";
+    import Swal from "sweetalert2";
+    import { Label } from "@/components/ui/label";
+    
+    export default function Home() {
+      const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+      const [isSubmitting, setIsSubmitting] = useState(false);
+    
+      const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      ) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+      };
+    
+      const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+    
+        try {
+          const response = await fetch("/api/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+    
+          if (!response.ok) throw new Error("Error sending message");
+    
+          // Success notification
+          await Swal.fire({
+            title: "¡Mensaje Enviado!",
+            html: `
+              <div class="text-center">
+                <h3 class="text-xl font-bold text-[#1F01B9] mb-2">¡Gracias por contactarnos!</h3>
+                <p class="text-gray-600">Hemos recibido tu mensaje correctamente.</p>
+                <p class="text-gray-600 mt-2">Te responderemos dentro de las 24 horas.</p>
+              </div>
+            `,
+            icon: "success",
+            background: "#f0f9ff",
+            confirmButtonColor: "#1F01B9",
+            confirmButtonText: "Entendido",
+            customClass: {
+              popup: "rounded-3xl shadow-2xl border-2 border-[#1F01B9]",
+              confirmButton: "rounded-2xl px-6 py-3 font-semibold",
+            },
+          });
+    
+          // Reset form
+          setFormData({ name: "", email: "", phone: "", message: "" });
+        } catch (error) {
+          console.error(error);
+    
+          // Error notification
+          await Swal.fire({
+            title: "¡Hubo un error!",
+            text: "Hubo un problema al enviar tu mensaje. Por favor, inténtalo nuevamente.",
+            icon: "error",
+            background: "#fef2f2",
+            confirmButtonColor: "#dc2626",
+            confirmButtonText: "Reintentar",
+            customClass: {
+              popup: "rounded-3xl shadow-2xl border-2 border-red-500",
+              confirmButton: "rounded-2xl px-6 py-3 font-semibold",
+            },
+          });
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+    
+      return (
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            {/* Name Input */}
+            <div>
+              <Label htmlFor="name" className="block text-sm font-medium mb-2">
+                Nombre *
+              </Label>
+              <input
+                id="name"
+                value={formData.name}
+                onChange={handleChange}
+                type="text"
+                className="w-full px-4 py-3 rounded-full border-2 border-neutral-300 focus:border-blue-500"
+                placeholder="Tu nombre completo"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+    
+            {/* Email Input */}
+            <div>
+              <Label htmlFor="email" className="block text-sm font-medium mb-2">
+                Email *
+              </Label>
+              <input
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                type="email"
+                className="w-full px-4 py-3 rounded-full border-2 border-neutral-300 focus:border-blue-500"
+                placeholder="tu@email.com"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+    
+            {/* Phone Input */}
+            <div>
+              <Label htmlFor="phone" className="block text-sm font-medium mb-2">
+                Teléfono (Opcional)
+              </Label>
+              <input
+                id="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                type="tel"
+                className="w-full px-4 py-3 rounded-full border-2 border-neutral-300 focus:border-blue-500"
+                placeholder="+51 999 999 999"
+                disabled={isSubmitting}
+              />
+            </div>
+    
+            {/* Message Textarea */}
+            <div>
+              <Label htmlFor="message" className="block text-sm font-medium mb-2">
+                Mensaje *
+              </Label>
+              <textarea
+                id="message"
+                value={formData.message}
+                onChange={handleChange}
+                rows={4}
+                className="w-full px-4 py-3 rounded-3xl border-2 border-neutral-300 focus:border-blue-500 resize-none"
+                placeholder="Cuéntanos cómo podemos ayudarte..."
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+          </div>
+    
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-[#1F01B9] hover:bg-[#391FB6] text-white py-3 rounded-full font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              "Enviar Mensaje"
+            )}
+          </button>
+        </form>
+      );
+    }
+    ```
+  </Tab>
+  <Tab title="State Management">
+    **Form State:**
+    
+    ```tsx
+    const [formData, setFormData] = useState({
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    ```
+    
+    - `formData`: Stores all form field values
+    - `isSubmitting`: Tracks submission state for loading UI
+    
+    **Change Handler:**
+    
+    ```tsx
+    const handleChange = (e) => {
+      setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+    ```
+    
+    Updates the specific field that changed using computed property names.
+  </Tab>
+</Tabs>
+
+---
+
+## SweetAlert2 Notifications
+
+### Success Notification
+
+<Tabs>
+  <Tab title="Success Alert">
+    ```typescript
+    await Swal.fire({
+      title: "¡Mensaje Enviado!",
+      html: `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-[#1F01B9] mb-2">
+            ¡Gracias por contactarnos!
+          </h3>
+          <p class="text-gray-600">Hemos recibido tu mensaje correctamente.</p>
+          <p class="text-gray-600 mt-2">Te responderemos dentro de las 24 horas.</p>
+        </div>
+      `,
+      icon: "success",
+      showClass: {
+        popup: "animate__animated animate__fadeInUp animate__faster",
+      },
+      hideClass: {
+        popup: "animate__animated animate__fadeOutDown animate__faster",
+      },
+      background: "#f0f9ff",
+      confirmButtonColor: "#1F01B9",
+      confirmButtonText: "Entendido",
+      customClass: {
+        popup: "rounded-3xl shadow-2xl border-2 border-[#1F01B9]",
+        confirmButton: "rounded-2xl px-6 py-3 font-semibold",
+      },
+    });
+    ```
+  </Tab>
+  <Tab title="Error Alert">
+    ```typescript
+    await Swal.fire({
+      title: "¡Hubo un error!",
+      text: "Hubo un problema al enviar tu mensaje. Por favor, inténtalo nuevamente.",
+      icon: "error",
+      showClass: {
+        popup: "animate__animated animate__shakeX animate__faster",
+      },
+      background: "#fef2f2",
+      confirmButtonColor: "#dc2626",
+      confirmButtonText: "Reintentar",
+      customClass: {
+        popup: "rounded-3xl shadow-2xl border-2 border-red-500",
+        confirmButton: "rounded-2xl px-6 py-3 font-semibold",
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  The alerts use Animate.css classes for smooth entry/exit animations.
+</Note>
+
+---
+
+## Loading State
+
+The submit button shows a loading spinner during submission:
+
+```tsx
+{isSubmitting ? (
+  <>
+    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+    Enviando...
+  </>
+) : (
+  "Enviar Mensaje"
+)}
+```
+
+**Features:**
+- Animated spinner using CSS `animate-spin`
+- Button is disabled during submission
+- Visual feedback prevents multiple submissions
+
+---
+
+## Email Service Configuration
+
+<Accordion title="Gmail Setup">
+  ### Using Gmail SMTP
+  
+  1. Enable 2-factor authentication on your Google account
+  2. Go to [App passwords](https://myaccount.google.com/apppasswords)
+  3. Generate a new app password for "Mail"
+  4. Use this password in `EMAIL_PASSWORD`
+  
+  **Configuration:**
+  ```typescript
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+  ```
+</Accordion>
+
+<Accordion title="Other Email Services">
+  ### Using Custom SMTP
+  
+  ```typescript
+  const transporter = nodemailer.createTransport({
+    host: "smtp.example.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+  ```
+  
+  ### Using SendGrid
+  
+  ```typescript
+  const transporter = nodemailer.createTransport({
+    host: "smtp.sendgrid.net",
+    port: 587,
+    auth: {
+      user: "apikey",
+      pass: process.env.SENDGRID_API_KEY,
+    },
+  });
+  ```
+</Accordion>
+
+---
+
+## Security Considerations
+
+<Warning>
+  **Important Security Practices:**
+  
+  1. Never expose email credentials in client-side code
+  2. Use environment variables for sensitive data
+  3. Validate and sanitize user input
+  4. Implement rate limiting to prevent spam
+  5. Add CAPTCHA for production use
+</Warning>
+
+### Rate Limiting Example
+
+```typescript app/api/contact/route.ts
+import { rateLimit } from "express-rate-limit";
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+});
+
+export async function POST(req: Request) {
+  // Apply rate limiting
+  // ... rest of handler
+}
+```
+
+---
+
+## Form Validation
+
+### HTML5 Validation
+
+The form uses built-in HTML5 validation:
+
+```tsx
+<input
+  type="email"
+  required
+  placeholder="tu@email.com"
+/>
+```
+
+### Custom Validation (Optional)
+
+```tsx
+const validateEmail = (email: string) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!validateEmail(formData.email)) {
+    await Swal.fire({
+      icon: "error",
+      title: "Email inválido",
+      text: "Por favor ingresa un email válido.",
+    });
+    return;
+  }
+  
+  // Continue with submission
+};
+```
+
+---
+
+## Testing
+
+<Tabs>
+  <Tab title="Manual Testing">
+    1. Fill out the form with test data
+    2. Submit the form
+    3. Check your email inbox for the message
+    4. Verify the reply-to address is correct
+    5. Test error handling by using invalid credentials
+  </Tab>
+  <Tab title="Error Scenarios">
+    Test these error cases:
+    
+    - Missing environment variables
+    - Invalid email credentials
+    - Network errors
+    - Invalid email format
+    - Empty required fields
+  </Tab>
+</Tabs>
+
+---
+
+## Troubleshooting
+
+<Accordion title="Email not sending">
+  1. Check environment variables are set correctly
+  2. Verify Gmail App Password is valid
+  3. Check for errors in server console
+  4. Ensure 2FA is enabled on Google account
+  5. Check spam folder
+</Accordion>
+
+<Accordion title="SMTP Authentication Error">
+  - Regenerate App Password
+  - Ensure using App Password, not regular password
+  - Check for extra spaces in .env file
+  - Verify EMAIL_USER is correct Gmail address
+</Accordion>
+
+<Accordion title="Form not submitting">
+  - Check browser console for errors
+  - Verify API route is accessible
+  - Check network tab for failed requests
+  - Ensure all required fields are filled
+</Accordion>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Add CAPTCHA" icon="shield-check">
+    Implement reCAPTCHA to prevent spam submissions
+  </Card>
+  <Card title="Add Attachments" icon="paperclip">
+    Allow users to attach files to their messages
+  </Card>
+  <Card title="Email Templates" icon="envelope">
+    Use HTML email templates for better formatting
+  </Card>
+  <Card title="Database Storage" icon="database">
+    Store form submissions in a database
+  </Card>
+</CardGroup>
+
+## Related Features
+
+- [Animations →](/features/animations)
+- [Smooth Scroll →](/features/smooth-scroll)
+- [Carousels →](/features/carousels)

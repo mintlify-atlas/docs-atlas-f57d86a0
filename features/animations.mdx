@@ -1,0 +1,403 @@
+---
+title: Animations
+description: Implementing animations with Framer Motion and GSAP in Eufrosine
+---
+
+# Animations
+
+Eufrosine uses **Framer Motion** as the primary animation library to create smooth, declarative animations throughout the application. The project also includes **GSAP** for advanced timeline-based animations.
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install framer-motion gsap
+```
+
+```bash yarn
+yarn add framer-motion gsap
+```
+
+```bash pnpm
+pnpm add framer-motion gsap
+```
+</CodeGroup>
+
+## Current Versions
+
+- **Framer Motion**: v12.23.24
+- **GSAP**: v3.13.0
+
+---
+
+## Framer Motion Implementation
+
+### 1. Animated Navbar Logo
+
+The navbar features an expandable logo that reveals the full brand name on hover.
+
+<Tabs>
+  <Tab title="Code">
+    ```tsx components/navbar.tsx
+    "use client";
+    
+    import { motion } from "framer-motion";
+    import { useState } from "react";
+    
+    function Navbar() {
+      const [isHovered, setIsHovered] = useState(false);
+    
+      return (
+        <motion.button
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          animate={{ width: isHovered ? "11rem" : "3.5rem" }}
+          transition={{ type: "spring", stiffness: 120, damping: 15 }}
+          className="overflow-hidden bg-[#1F01B9] rounded-full h-14"
+        >
+          <div className="flex items-center pl-3">
+            <p className="text-6xl font-bold text-white">e</p>
+            
+            <motion.span
+              animate={{
+                opacity: isHovered ? 1 : 0,
+                x: isHovered ? 0 : -10,
+              }}
+              transition={{ delay: isHovered ? 0.2 : 0, duration: 0.4 }}
+              className="text-3xl text-white font-semibold"
+            >
+              ufrosine
+            </motion.span>
+          </div>
+        </motion.button>
+      );
+    }
+    ```
+  </Tab>
+  <Tab title="Explanation">
+    **Animation Breakdown:**
+    
+    1. **Width Animation**: Uses a spring transition for natural motion
+       - Collapsed: `3.5rem`
+       - Expanded: `11rem`
+    
+    2. **Text Reveal**: Fades in brand name with horizontal slide
+       - Opacity: `0 → 1`
+       - Transform: `x: -10 → 0`
+       - Delay: `0.2s` on hover
+    
+    3. **Spring Physics**:
+       - `stiffness: 120` - Controls spring resistance
+       - `damping: 15` - Controls spring bounciness
+  </Tab>
+</Tabs>
+
+---
+
+### 2. Staggered Menu Animation
+
+The navigation menu uses cascading panel animations with staggered list items.
+
+<Tabs>
+  <Tab title="Code">
+    ```tsx components/customStaggeredMenu.tsx
+    import { motion, AnimatePresence } from "framer-motion";
+    import { useState, useEffect } from "react";
+    
+    export default function CustomStaggeredMenu({ items }) {
+      const [isOpen, setIsOpen] = useState(false);
+      const [isMobile, setIsMobile] = useState(false);
+    
+      useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+      }, []);
+    
+      const animationSpeed = isMobile ? 0.25 : 0.5;
+    
+      const itemVariants = {
+        hidden: { opacity: 0, x: 20 },
+        visible: (i: number) => ({
+          opacity: 1,
+          x: 0,
+          transition: {
+            delay: i * (isMobile ? 0.05 : 0.1) + 0.3,
+            duration: isMobile ? 0.2 : 0.3,
+            ease: [0.25, 0.1, 0.25, 1],
+          },
+        }),
+        exit: { opacity: 0, x: 20, transition: { duration: 0.2 } },
+      };
+    
+      return (
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.4 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setIsOpen(false)}
+                className="fixed inset-0 bg-black z-40"
+              />
+    
+              {/* Cascading Panels */}
+              {["#6368F8", "#2441E5", "#FFFFFF"].map((color, i) => (
+                <motion.div
+                  key={color}
+                  initial={{ x: "100%" }}
+                  animate={{ x: "0%" }}
+                  exit={{ x: "100%" }}
+                  transition={{
+                    type: "tween",
+                    duration: animationSpeed,
+                    delay: i * 0.1,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  }}
+                  className="fixed top-0 right-0 h-full w-60 md:w-[380px]"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+    
+              {/* Menu Content */}
+              <motion.aside
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "tween", duration: animationSpeed, delay: 0.25 }}
+                className="fixed top-0 right-0 h-full w-60 md:w-[380px] bg-white z-50"
+              >
+                <motion.ul
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="space-y-4"
+                >
+                  {items.map((item, i) => (
+                    <motion.li
+                      key={item.label}
+                      variants={itemVariants}
+                      custom={i}
+                    >
+                      <a href={`#${item.link}`}>{item.label}</a>
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
+      );
+    }
+    ```
+  </Tab>
+  <Tab title="Features">
+    **Key Animation Features:**
+    
+    ### Cascading Panels
+    Three colored panels slide in sequentially:
+    1. Primary blue (`#6368F8`)
+    2. Darker blue (`#2441E5`)
+    3. White background (`#FFFFFF`)
+    
+    Each panel has a `0.1s` stagger delay.
+    
+    ### Staggered List Items
+    - Items fade in from the right (`x: 20 → 0`)
+    - Each item has increasing delay based on index
+    - Mobile: `0.05s` per item
+    - Desktop: `0.1s` per item
+    
+    ### Responsive Speed
+    - Mobile animations: `0.25s` (faster)
+    - Desktop animations: `0.5s` (smoother)
+    
+    ### Custom Easing
+    Uses cubic-bezier easing: `[0.25, 0.1, 0.25, 1]` for smooth, natural motion.
+  </Tab>
+</Tabs>
+
+<Note>
+  The menu automatically detects mobile devices and adjusts animation timings for better performance on smaller screens.
+</Note>
+
+---
+
+### 3. Modal Animations
+
+Modals use Framer Motion for smooth entry/exit animations.
+
+```tsx Example Modal Animation
+import { motion } from "framer-motion";
+
+export function PrivacyPolicy({ onBack }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white rounded-3xl p-8"
+    >
+      {/* Modal content */}
+    </motion.div>
+  );
+}
+```
+
+---
+
+## CSS Transition Animations
+
+### Hover Effects
+
+The project also uses CSS transitions for simple hover effects:
+
+```tsx components/process.tsx
+const GridItem = ({ imageUrl, icon, title, description }) => {
+  return (
+    <div className="group relative rounded-3xl overflow-hidden transition-all duration-500">
+      {/* Background image with zoom effect */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+        style={{ backgroundImage: `url(${imageUrl})` }}
+      />
+      
+      {/* Overlay color transition */}
+      <div className="absolute inset-0 bg-zinc-200/90 group-hover:bg-black/20 transition-colors duration-700" />
+      
+      {/* Content fade and slide */}
+      <div className="relative transition-all duration-700 ease-in-out group-hover:opacity-0 group-hover:translate-y-5">
+        {/* Content */}
+      </div>
+    </div>
+  );
+};
+```
+
+**Effects Applied:**
+- Background image scales on hover (`scale-105`)
+- Overlay changes from light to dark
+- Content fades out and slides down
+- All transitions use `700ms` duration
+
+---
+
+## Animation Best Practices
+
+<Accordion title="Performance Optimization">
+  1. **Use `will-change-transform`** on animated elements
+  2. **Avoid animating expensive properties** (width, height) when possible
+  3. **Prefer transforms** over top/left positioning
+  4. **Use AnimatePresence** for exit animations
+  5. **Reduce animation duration** on mobile devices
+</Accordion>
+
+<Accordion title="Accessibility Considerations">
+  1. **Respect prefers-reduced-motion**:
+     ```tsx
+     const prefersReducedMotion = window.matchMedia(
+       "(prefers-reduced-motion: reduce)"
+     ).matches;
+     
+     const transition = prefersReducedMotion
+       ? { duration: 0 }
+       : { duration: 0.5 };
+     ```
+  
+  2. **Ensure animations don't block interaction**
+  3. **Provide alternative navigation** during transitions
+</Accordion>
+
+<Accordion title="Common Patterns">
+  **Fade In:**
+  ```tsx
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  ```
+  
+  **Slide In:**
+  ```tsx
+  initial={{ x: -100, opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  ```
+  
+  **Scale In:**
+  ```tsx
+  initial={{ scale: 0.8, opacity: 0 }}
+  animate={{ scale: 1, opacity: 1 }}
+  ```
+  
+  **Stagger Children:**
+  ```tsx
+  <motion.ul
+    variants={{
+      visible: {
+        transition: {
+          staggerChildren: 0.1
+        }
+      }
+    }}
+  >
+  ```
+</Accordion>
+
+---
+
+## GSAP Integration
+
+While GSAP is installed (`v3.13.0`), it's currently available for advanced animations:
+
+```tsx Using GSAP (Example)
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function AnimatedSection() {
+  const sectionRef = useRef(null);
+  
+  useEffect(() => {
+    gsap.from(sectionRef.current, {
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top 80%",
+        end: "bottom 20%",
+        scrub: true,
+      },
+      opacity: 0,
+      y: 100,
+    });
+  }, []);
+  
+  return <section ref={sectionRef}>Content</section>;
+}
+```
+
+<Warning>
+  GSAP is included in dependencies but not actively used in the current implementation. Framer Motion handles all current animation needs.
+</Warning>
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Framer Motion Docs" icon="book" href="https://www.framer.com/motion/">
+    Official Framer Motion documentation
+  </Card>
+  <Card title="GSAP Docs" icon="book" href="https://gsap.com/docs/v3/">
+    Official GSAP documentation
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- [Smooth Scroll Implementation →](/features/smooth-scroll)
+- [Carousels →](/features/carousels)
+- [Contact Form →](/features/contact-form)

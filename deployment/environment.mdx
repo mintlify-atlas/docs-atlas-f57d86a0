@@ -1,0 +1,240 @@
+---
+title: "Environment Variables"
+description: "Configure environment variables required for the Eufrosine application"
+---
+
+## Overview
+
+The Eufrosine application requires specific environment variables to function properly, particularly for email functionality in the contact and complaint forms.
+
+## Required Variables
+
+<Warning>
+  All environment variables must be configured before deploying to production. Missing credentials will cause API routes to fail with "Missing email credentials" error.
+</Warning>
+
+### EMAIL_USER
+
+**Required**: Yes  
+**Used in**: `app/api/contact/route.ts:16`, `app/api/complaint/route.ts:33`
+
+The Gmail account email address used to send emails from the application.
+
+```bash
+EMAIL_USER=your-email@gmail.com
+```
+
+**Purpose**: 
+- Authenticates with Gmail SMTP service
+- Sets the "from" address for all outgoing emails
+
+### EMAIL_PASSWORD
+
+**Required**: Yes  
+**Used in**: `app/api/contact/route.ts:17`, `app/api/complaint/route.ts:34`
+
+The Gmail account app password (not your regular Gmail password).
+
+```bash
+EMAIL_PASSWORD=your-app-specific-password
+```
+
+<Warning>
+  You must use a Gmail App Password, not your regular Gmail password. See the Gmail Configuration section below for setup instructions.
+</Warning>
+
+## Email Configuration
+
+Both API routes use the same email configuration:
+
+```typescript
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+```
+
+### Destination Email
+
+All emails are sent to: `aguademesaeufrosineperu@gmail.com`
+
+This is hardcoded in both routes:
+- Contact form: `app/api/contact/route.ts:23`
+- Complaint form: `app/api/complaint/route.ts:85`
+
+## Gmail App Password Setup
+
+<Steps>
+  <Step title="Enable 2-Factor Authentication">
+    Go to your Google Account settings and enable 2-Factor Authentication if not already enabled:
+    
+    1. Visit [Google Account Security](https://myaccount.google.com/security)
+    2. Navigate to "2-Step Verification"
+    3. Follow the setup process
+  </Step>
+
+  <Step title="Generate App Password">
+    Create an app-specific password:
+    
+    1. Go to [App Passwords](https://myaccount.google.com/apppasswords)
+    2. Select "Mail" as the app
+    3. Select your device or choose "Other"
+    4. Enter "Eufrosine App" as the name
+    5. Click "Generate"
+    6. Copy the 16-character password
+  </Step>
+
+  <Step title="Use the App Password">
+    Use the generated password as the `EMAIL_PASSWORD` value:
+    
+    ```bash
+    EMAIL_PASSWORD=abcd efgh ijkl mnop
+    ```
+    
+    <Warning>
+      Store this password securely. You won't be able to see it again after closing the generation window.
+    </Warning>
+  </Step>
+</Steps>
+
+## Configuration by Environment
+
+### Local Development
+
+Create a `.env.local` file in the project root:
+
+```bash
+# .env.local
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+```
+
+<Warning>
+  Never commit `.env.local` to version control. Add it to `.gitignore`.
+</Warning>
+
+### Vercel Deployment
+
+Configure environment variables in the Vercel dashboard:
+
+<Steps>
+  <Step title="Access Project Settings">
+    Navigate to your project in Vercel dashboard and go to Settings > Environment Variables
+  </Step>
+
+  <Step title="Add Variables">
+    Add each variable:
+    
+    - **Key**: `EMAIL_USER`
+    - **Value**: Your Gmail address
+    - **Environment**: Production, Preview, Development (select all)
+    
+    - **Key**: `EMAIL_PASSWORD`
+    - **Value**: Your Gmail app password
+    - **Environment**: Production, Preview, Development (select all)
+  </Step>
+
+  <Step title="Redeploy">
+    After adding variables, redeploy your application for changes to take effect.
+  </Step>
+</Steps>
+
+See the [Vercel Deployment](/deployment/vercel) guide for detailed instructions.
+
+### Other Platforms
+
+For other hosting platforms, configure these variables according to their documentation:
+
+- **AWS**: Use AWS Systems Manager Parameter Store or Secrets Manager
+- **Docker**: Pass via `docker run -e` flag or docker-compose environment section
+- **Heroku**: Use `heroku config:set` command
+- **Netlify**: Configure in Site Settings > Environment Variables
+
+## Validation
+
+Both API routes validate environment variables at runtime (`app/api/contact/route.ts:9-11`, `app/api/complaint/route.ts:26-28`):
+
+```typescript
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+  throw new Error("Missing email credentials");
+}
+```
+
+If variables are missing, the API will return:
+
+```json
+{
+  "error": "Error sending email",
+  "status": 500
+}
+```
+
+## Testing Configuration
+
+To verify your email configuration:
+
+<Steps>
+  <Step title="Start Development Server">
+    ```bash
+    npm run dev
+    ```
+  </Step>
+
+  <Step title="Test Contact Form">
+    Navigate to the contact form and submit a test message. Check that:
+    - The form submits successfully
+    - Email is received at `aguademesaeufrosineperu@gmail.com`
+    - No errors appear in the console
+  </Step>
+
+  <Step title="Test Complaint Form">
+    Navigate to the complaints book ("Libro de Reclamaciones") and submit a test complaint to verify email delivery.
+  </Step>
+</Steps>
+
+## Security Best Practices
+
+<Warning>
+  Follow these security guidelines to protect your credentials:
+</Warning>
+
+- Never commit environment variables to version control
+- Use app-specific passwords, not regular Gmail passwords
+- Rotate passwords regularly
+- Use different credentials for development and production
+- Implement rate limiting on API routes to prevent abuse
+- Monitor email sending for unusual activity
+- Consider using a dedicated email service like SendGrid or AWS SES for production
+
+## Troubleshooting
+
+### "Missing email credentials" Error
+
+**Cause**: Environment variables not set or not loaded
+
+**Solution**:
+1. Verify `.env.local` exists in project root
+2. Check variable names match exactly (case-sensitive)
+3. Restart the development server after changing environment variables
+
+### Gmail Authentication Failed
+
+**Cause**: Invalid app password or 2FA not enabled
+
+**Solution**:
+1. Verify 2-Factor Authentication is enabled on your Google account
+2. Generate a new app password
+3. Ensure there are no extra spaces in the password
+
+### Emails Not Received
+
+**Cause**: Gmail rate limiting or spam filtering
+
+**Solution**:
+1. Check Gmail's sending limits (500 emails/day for free accounts)
+2. Check spam/junk folders
+3. Verify the destination email address is correct
+4. Check Gmail account for security alerts

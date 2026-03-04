@@ -1,0 +1,180 @@
+---
+title: 'Complaint API'
+description: 'Submit consumer complaints to the complaints book (Libro de Reclamaciones)'
+---
+
+## POST /api/complaint
+
+Submits a formal consumer complaint to the company's complaints book (Libro de Reclamaciones) as required by Peruvian consumer protection law (Ley N° 29571).
+
+### Authentication
+
+This endpoint requires the following environment variables to be configured:
+
+- `EMAIL_USER` - Gmail account username for sending emails
+- `EMAIL_PASSWORD` - Gmail account password or app-specific password
+
+### Request Body
+
+#### Consumer Information
+
+<ParamField body="tipoDocumento" type="string" required>
+  Type of identification document (e.g., "DNI", "CE", "Pasaporte")
+</ParamField>
+
+<ParamField body="numeroDocumento" type="string" required>
+  Identification document number
+</ParamField>
+
+<ParamField body="nombres" type="string" required>
+  First name(s) of the consumer
+</ParamField>
+
+<ParamField body="apellidos" type="string" required>
+  Last name(s) of the consumer
+</ParamField>
+
+<ParamField body="domicilio" type="string" required>
+  Home address of the consumer
+</ParamField>
+
+<ParamField body="departamento" type="string" required>
+  Department (state/province) of residence
+</ParamField>
+
+<ParamField body="provincia" type="string" required>
+  Province of residence
+</ParamField>
+
+<ParamField body="distrito" type="string" required>
+  District of residence
+</ParamField>
+
+<ParamField body="telefono" type="string" required>
+  Contact phone number
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  Contact email address (used as reply-to address)
+</ParamField>
+
+#### Complaint Details
+
+<ParamField body="tipoBienContratado" type="string" required>
+  Type of product or service (e.g., "Producto", "Servicio")
+</ParamField>
+
+<ParamField body="descripcionBien" type="string" required>
+  Description of the product or service
+</ParamField>
+
+<ParamField body="montoReclamado" type="string" required>
+  Amount being claimed (will be formatted as Peruvian Soles)
+</ParamField>
+
+<ParamField body="fechaIncidente" type="string" required>
+  Date when the incident occurred (ISO format recommended)
+</ParamField>
+
+<ParamField body="detalleReclamo" type="string" required>
+  Detailed description of the complaint
+</ParamField>
+
+<ParamField body="pedidoConsumidor" type="string" required>
+  Consumer's petition or requested resolution
+</ParamField>
+
+### Response
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the complaint was submitted successfully
+</ResponseField>
+
+<ResponseField name="error" type="string">
+  Error message if the request failed (only present on error)
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST https://yourdomain.com/api/complaint \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "12345678",
+    "nombres": "María",
+    "apellidos": "García López",
+    "domicilio": "Av. Principal 123",
+    "departamento": "Lima",
+    "provincia": "Huaura",
+    "distrito": "Hualmay",
+    "telefono": "+51 987654321",
+    "email": "maria.garcia@example.com",
+    "tipoBienContratado": "Producto",
+    "descripcionBien": "Botella de agua de mesa 20L",
+    "montoReclamado": "25.50",
+    "fechaIncidente": "2026-03-01",
+    "detalleReclamo": "El producto llegó en mal estado y con fecha de vencimiento próxima.",
+    "pedidoConsumidor": "Solicito el reembolso completo del monto pagado y una disculpa formal."
+  }'
+```
+
+### Example Response
+
+#### Success Response (200)
+
+```json
+{
+  "success": true
+}
+```
+
+#### Error Response (500)
+
+```json
+{
+  "error": "Error sending complaint email"
+}
+```
+
+### Error Handling
+
+The endpoint returns the following error scenarios:
+
+- **500 Internal Server Error**: Occurs when email credentials are missing or when the email fails to send
+  - Missing `EMAIL_USER` or `EMAIL_PASSWORD` environment variables
+  - SMTP connection or authentication failures
+  - Invalid recipient email configuration
+
+### Email Configuration
+
+The complaint is sent as a formatted email:
+
+- **From**: Configured `EMAIL_USER`
+- **To**: aguademesaeufrosineperu@gmail.com
+- **Subject**: "📖 Libro de Reclamaciones - Nueva Reclamación de [nombres] [apellidos]"
+- **Reply-To**: The consumer's email address
+- **Content**: Professional formatted complaint with all details
+
+### Email Format
+
+The email includes:
+
+1. **Consumer Data**: Personal identification and contact information
+2. **Complaint Details**: Date, type of product/service, description, and claimed amount
+3. **Complaint Description**: Detailed explanation of the issue
+4. **Consumer Petition**: Requested resolution
+5. **Company Information**: 
+   - Razón Social: Punto Vida H2O S.A.C.
+   - RUC: 20613393367
+   - Domicilio: Av. Cincuentenario Nro 390, Hualmay, Huaura, Lima
+6. **Legal Notice**: Reminder to respond within 30 calendar days per Ley N° 29571
+
+### Implementation Notes
+
+- The endpoint validates that email credentials exist before attempting to send
+- Amount is automatically formatted as Peruvian Soles (S/)
+- Uses Gmail service for email transport
+- Includes legal compliance information for Peruvian consumer protection law
+- Company must respond within 30 calendar days as required by law
+- Reply-to header set to consumer's email for direct communication

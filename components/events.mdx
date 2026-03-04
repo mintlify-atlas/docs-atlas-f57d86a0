@@ -1,0 +1,351 @@
+---
+title: 'Events Section'
+description: 'Event showcase layout with image galleries, descriptions, and hashtag badges'
+---
+
+# Events Section
+
+The Events section displays sponsored events and collaborations with image galleries, descriptions, and hashtag badges.
+
+## Location
+
+Implemented directly in `app/page.tsx` (lines 403-543)
+
+## Features
+
+- Alternating left/right image layouts
+- Hover zoom effects on images
+- Badge integration for event hashtags
+- Responsive grid layout
+- Overflow hidden for smooth image transitions
+- Neumorphic card shadows
+
+## Structure
+
+```tsx
+<section id="eventos" className="max-w-sm sm:max-w-5xl 2xl:max-w-6xl mx-auto min-h-screen w-full pt-10 pb-10">
+  <div className="flex flex-col items-center justify-center text-center px-6">
+    <h2 className="text-2xl md:text-4xl font-bold text-[#1F01B9] mb-3">
+      Apoyamos Eventos
+    </h2>
+    <p className="text-sm md:text-base text-gray-700">
+      Aprovecha nuestras promociones y ahorra en tus compras
+    </p>
+  </div>
+  <div className="grid grid-cols-1 gap-8 sm:gap-12 mt-8 px-6">
+    {/* Event cards */}
+  </div>
+</section>
+```
+
+## Event Card Component
+
+### Layout Pattern 1: Image Left
+
+```tsx
+<div className="group h-fit xl:h-70 2xl:h-75 flex flex-col md:flex-row items-center text-center rounded-[40px] bg-white overflow-hidden shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff] md:shadow-[8px_8px_16px_#c5c5c5,-8px_-8px_16px_#ffffff] lg:shadow-[15px_15px_30px_#bebebe,-15px_-15px_30px_#ffffff]">
+  {/* Image with zoom effect */}
+  <div className="overflow-hidden w-full md:w-3/7">
+    <div className="transition-transform duration-700 ease-out lg:group-hover:scale-135">
+      <img
+        src="/img/evento-1.webp"
+        alt="Botella 500ml"
+        className="w-full h-full md:h-80 lg:h-full object-cover"
+      />
+    </div>
+  </div>
+
+  {/* Content */}
+  <div className="p-4 md:p-6 text-start w-full md:w-3/5 h-full flex flex-col justify-between gap-4">
+    <div className="flex flex-col gap-3">
+      <h3 className="text-base xl:text-xl font-semibold text-[#1F01B9]">
+        Campeonato Interno de Exalumnos – UNJFSC
+      </h3>
+      <p className="text-gray-700 text-sm xl:text-base mb-4">
+        La marca Eufrosine estuvo presente en el Campeonato Interno
+        de Exalumnos de la Universidad Nacional José Faustino
+        Sánchez Carrión, apoyando la unión, la energía y la
+        hidratación de cada participante.
+      </p>
+    </div>
+    <div className="flex items-start gap-2 md:gap-4">
+      <Badge className="bg-blue-500 text-white text-xs xl:text-sm">
+        <FaHashtag className="w-8 h-8" />
+        Universidad
+      </Badge>
+      <Badge className="bg-blue-500 text-white text-xs xl:text-sm">
+        <FaHashtag className="w-8 h-8" />
+        ExAlumnos
+      </Badge>
+    </div>
+  </div>
+</div>
+```
+
+### Layout Pattern 2: Image Right
+
+```tsx
+<div className="group h-fit xl:h-70 2xl:h-75 flex flex-col md:flex-row-reverse items-center text-center rounded-[40px] bg-white overflow-hidden shadow-[...}">
+  {/* Image on right for desktop */}
+  <div className="overflow-hidden w-full md:w-3/7">
+    <div className="transition-transform duration-700 ease-out lg:group-hover:scale-135">
+      <img src="/img/evento-2.webp" alt="Event" className="w-full h-full md:h-80 lg:h-full object-cover" />
+    </div>
+  </div>
+
+  {/* Content on left */}
+  <div className="p-4 md:p-6 text-start w-full md:w-3/5 h-full flex flex-col justify-between gap-4">
+    {/* Same content structure */}
+  </div>
+</div>
+```
+
+Note the `md:flex-row-reverse` class for alternating layouts.
+
+## Event Data
+
+Event data is currently hardcoded in the page. Here's the structure:
+
+### Event 1: University Championship
+
+```tsx
+{
+  image: "/img/evento-1.webp",
+  title: "Campeonato Interno de Exalumnos – UNJFSC",
+  description: "La marca Eufrosine estuvo presente en el Campeonato Interno de Exalumnos de la Universidad Nacional José Faustino Sánchez Carrión, apoyando la unión, la energía y la hidratación de cada participante. Un evento lleno de compañerismo y deporte donde el agua de calidad acompañó cada momento.",
+  tags: ["Universidad", "ExAlumnos"]
+}
+```
+
+### Event 2: Lightning Soccer Tournament
+
+```tsx
+{
+  image: "/img/evento-2.webp",
+  title: "Campeonato Relámpago de Fútbol",
+  description: "En un emocionante campeonato relámpago, los equipos demostraron su talento, esfuerzo y trabajo en equipo bajo el sol. Eufrosine acompañó a los jugadores brindando hidratación pura y frescura durante todo el torneo, promoviendo el deporte y el bienestar físico.",
+  tags: ["Fútbol", "Hidratación"]
+}
+```
+
+### Event 3: Volleyball Championship
+
+```tsx
+{
+  image: "/img/evento-3.webp",
+  title: "Campeonato de Vóley",
+  description: "Las jugadoras y jugadores vivieron una jornada intensa de competencia y diversión en el campeonato de vóley, donde Eufrosine fue parte fundamental al mantenerlos frescos e hidratados. Una experiencia que refuerza nuestro compromiso con el deporte y la vida saludable.",
+  tags: ["Vóley", "VidaSaludable"]
+}
+```
+
+## Hover Effects
+
+### Image Zoom
+
+```css
+.group:hover .scale-135 {
+  transform: scale(1.35);
+}
+
+transition-transform duration-700 ease-out
+```
+
+Images scale to 135% with a smooth 700ms easing transition on hover.
+
+### Implementation
+
+```tsx
+<div className="overflow-hidden w-full md:w-3/7">
+  <div className="transition-transform duration-700 ease-out lg:group-hover:scale-135">
+    <img src="/img/evento-1.webp" alt="Event" className="w-full h-full object-cover" />
+  </div>
+</div>
+```
+
+The parent div has `overflow-hidden` to prevent the scaled image from breaking the card layout.
+
+## Badge Component Usage
+
+```tsx
+import { Badge } from "@/components/ui/badge";
+import { FaHashtag } from "react-icons/fa";
+
+<Badge className="bg-blue-500 text-white text-xs xl:text-sm dark:bg-blue-600">
+  <FaHashtag className="w-8 h-8" />
+  Universidad
+</Badge>
+```
+
+<ParamField path="className" type="string">
+  Custom styling - blue background with white text
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  Hashtag icon and tag text
+</ParamField>
+
+## Responsive Behavior
+
+### Mobile (< 768px)
+
+- Images appear above content
+- Single column layout
+- Smaller text sizes
+- Reduced padding and gaps
+
+### Desktop (>= 768px)
+
+- Side-by-side layout (image + content)
+- Image takes 3/7 width, content takes 3/5 width
+- Alternating left/right image positions
+- Larger text and spacing
+- Hover zoom effects enabled
+
+### Layout Classes
+
+```css
+/* Mobile */
+flex flex-col
+
+/* Desktop - Image Left */
+md:flex-row
+
+/* Desktop - Image Right */
+md:flex-row-reverse
+```
+
+## Styling
+
+### Card Container
+
+```css
+rounded-[40px]
+bg-white
+overflow-hidden
+```
+
+### Neumorphic Shadows
+
+```css
+/* Mobile */
+shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff]
+
+/* Tablet */
+md:shadow-[8px_8px_16px_#c5c5c5,-8px_-8px_16px_#ffffff]
+
+/* Desktop */
+lg:shadow-[15px_15px_30px_#bebebe,-15px_-15px_30px_#ffffff]
+```
+
+Dual shadows create a raised 3D effect.
+
+### Content Layout
+
+```tsx
+<div className="p-4 md:p-6 text-start w-full md:w-3/5 h-full flex flex-col justify-between gap-4">
+  <div className="flex flex-col gap-3">
+    {/* Title and description */}
+  </div>
+  <div className="flex items-start gap-2">
+    {/* Badges */}
+  </div>
+</div>
+```
+
+Flexbox with `justify-between` pushes badges to the bottom.
+
+## Usage Example
+
+The events section is included in the main page:
+
+```tsx
+// app/page.tsx
+
+export default function Home() {
+  return (
+    <main>
+      {/* Other sections */}
+      
+      <section id="eventos" className="max-w-sm sm:max-w-5xl mx-auto min-h-screen w-full pt-10 pb-10">
+        <div className="flex flex-col items-center justify-center text-center px-6">
+          <h2 className="text-2xl md:text-4xl font-bold text-[#1F01B9] mb-3">
+            Apoyamos Eventos
+          </h2>
+          <p className="text-sm md:text-base text-gray-700">
+            Conoce nuestros patrocinios y colaboraciones deportivas
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 gap-8 sm:gap-12 mt-8 px-6">
+          {/* Event cards here */}
+        </div>
+      </section>
+    </main>
+  );
+}
+```
+
+## Potential Refactoring
+
+Consider extracting to a reusable component:
+
+```tsx
+// components/eventCard.tsx
+interface EventCardProps {
+  image: string;
+  title: string;
+  description: string;
+  tags: string[];
+  imagePosition?: 'left' | 'right';
+}
+
+export function EventCard({ 
+  image, 
+  title, 
+  description, 
+  tags, 
+  imagePosition = 'left' 
+}: EventCardProps) {
+  const flexDirection = imagePosition === 'right' ? 'md:flex-row-reverse' : 'md:flex-row';
+  
+  return (
+    <div className={`group flex flex-col ${flexDirection} rounded-[40px] bg-white overflow-hidden shadow-[...]`}>
+      <div className="overflow-hidden w-full md:w-3/7">
+        <div className="transition-transform duration-700 ease-out lg:group-hover:scale-135">
+          <img src={image} alt={title} className="w-full h-full object-cover" />
+        </div>
+      </div>
+      
+      <div className="p-4 md:p-6 text-start w-full md:w-3/5 flex flex-col justify-between gap-4">
+        <div className="flex flex-col gap-3">
+          <h3 className="text-base xl:text-xl font-semibold text-[#1F01B9]">{title}</h3>
+          <p className="text-gray-700 text-sm xl:text-base">{description}</p>
+        </div>
+        <div className="flex items-start gap-2">
+          {tags.map((tag) => (
+            <Badge key={tag} className="bg-blue-500 text-white text-xs xl:text-sm">
+              <FaHashtag className="w-8 h-8" />
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## Accessibility
+
+- Descriptive alt text for event images
+- Semantic HTML structure with proper headings
+- Color contrast meets WCAG AA standards
+- Touch-friendly tap targets
+
+## Performance
+
+- Images optimized as WebP format
+- CSS transforms use GPU acceleration
+- `overflow-hidden` prevents reflows during zoom
+- Lazy loading can be added for off-screen images

@@ -1,0 +1,100 @@
+---
+title: 'Contact API'
+description: 'Send contact form submissions via email'
+---
+
+## POST /api/contact
+
+Submits a contact form and sends the information via email to the configured recipient.
+
+### Authentication
+
+This endpoint requires the following environment variables to be configured:
+
+- `EMAIL_USER` - Gmail account username for sending emails
+- `EMAIL_PASSWORD` - Gmail account password or app-specific password
+
+### Request Body
+
+<ParamField body="name" type="string" required>
+  Full name of the person submitting the contact form
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  Email address of the contact person (used as reply-to address)
+</ParamField>
+
+<ParamField body="phone" type="string" required>
+  Phone number of the contact person
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  Message content from the contact form
+</ParamField>
+
+### Response
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the email was sent successfully
+</ResponseField>
+
+<ResponseField name="error" type="string">
+  Error message if the request failed (only present on error)
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST https://yourdomain.com/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Juan Pérez",
+    "email": "juan.perez@example.com",
+    "phone": "+51 987654321",
+    "message": "Quisiera información sobre sus productos de agua de mesa."
+  }'
+```
+
+### Example Response
+
+#### Success Response (200)
+
+```json
+{
+  "success": true
+}
+```
+
+#### Error Response (500)
+
+```json
+{
+  "error": "Error sending email"
+}
+```
+
+### Error Handling
+
+The endpoint returns the following error scenarios:
+
+- **500 Internal Server Error**: Occurs when email credentials are missing or when the email fails to send
+  - Missing `EMAIL_USER` or `EMAIL_PASSWORD` environment variables
+  - SMTP connection or authentication failures
+  - Invalid recipient email configuration
+
+### Email Configuration
+
+The endpoint uses Gmail SMTP service with nodemailer. The email is sent:
+
+- **From**: Configured `EMAIL_USER`
+- **To**: aguademesaeufrosineperu@gmail.com
+- **Subject**: "Has recibido un mensaje desde tu Web Eufrosine"
+- **Reply-To**: The email address provided in the request
+- **Content**: Formatted with client name, phone, email, and message
+
+### Implementation Notes
+
+- The endpoint validates that email credentials exist before attempting to send
+- Uses Gmail service for email transport
+- Sets reply-to header to the customer's email for easy responses
+- Errors are logged to console and returned with 500 status code

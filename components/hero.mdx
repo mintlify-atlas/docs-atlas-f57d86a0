@@ -1,0 +1,283 @@
+---
+title: 'Hero Section with Video Background'
+description: 'Full-screen hero section featuring an optimized video background component'
+---
+
+# Hero Section with Video Background
+
+The hero section is a full-screen landing area that features a video background, overlay, headline, description, and call-to-action buttons.
+
+## Implementation
+
+The hero section is implemented in `app/page.tsx` and uses the `OptimizedVideo` component:
+
+```tsx
+<section id="inicio" className="relative h-screen">
+  <OptimizedVideo />
+  <div className="absolute h-full inset-0 bg-black/50 -z-10" />
+
+  <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+    <h1 className={clsx(
+      "text-4xl 2xl:text-7xl mb-8 text-white font-bold",
+      pacifico.className
+    )}>
+      Hidratación Pura, Vida Sana
+    </h1>
+    <p className="max-w-4xl text-lg md:text-2xl 2xl:text-3xl text-gray-200 mb-8 font-semibold">
+      Eufrosine te ofrece agua purificada de la más alta calidad, esencial
+      para tu bienestar diario y salud integral.
+    </p>
+    <div className="flex gap-4 md:gap-8 mt-4">
+      {/* CTA Buttons */}
+    </div>
+  </div>
+</section>
+```
+
+## Hero Structure
+
+### Video Layer
+
+```tsx
+<OptimizedVideo />
+<div className="absolute h-full inset-0 bg-black/50 -z-10" />
+```
+
+The video is positioned with `z-index: -10` with a semi-transparent black overlay (`bg-black/50`) for text readability.
+
+### Content Layer
+
+```tsx
+<div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+  {/* Content */}
+</div>
+```
+
+Content is centered vertically and horizontally using flexbox.
+
+### Call-to-Action Buttons
+
+```tsx
+<div className="flex gap-4 md:gap-8 mt-4">
+  <button
+    onClick={() => scrollToSection("ofertas")}
+    className="flex items-center gap-2 px-4 md:px-8 lg:px-12 py-4 rounded-full bg-[#1F01B9] hover:bg-[#391FB6] text-base font-semibold text-white transition-colors cursor-pointer"
+  >
+    <BiSolidOffer className="shrink-0" size={18} />
+    Ver Ofertas
+  </button>
+  <a
+    href="https://api.whatsapp.com/send?phone=51903565918"
+    target="_blank"
+    rel="noopener"
+  >
+    <button className="flex items-center gap-2 px-4 md:px-8 lg:px-12 py-4 rounded-full bg-white hover:bg-zinc-200 text-base font-semibold text-black transition-colors cursor-pointer">
+      <FaWhatsapp className="shrink-0 text-green-700" size={18} />
+      Escribenos
+    </button>
+  </a>
+</div>
+```
+
+## OptimizedVideo Component
+
+Location: `components/optimized-video.tsx`
+
+### Features
+
+- Lazy loading with intelligent preload strategy
+- Smooth fade-in transition when loaded
+- Gradient placeholder during load
+- Autoplay with loop and muted attributes
+- Mobile-optimized video file
+
+### Component Code
+
+```tsx
+"use client";
+
+import { useState, useRef, useEffect } from 'react';
+
+export default function OptimizedVideo() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleCanPlay = () => {
+      setIsLoaded(true);
+      video.play().catch(console.error);
+    };
+
+    video.addEventListener('canplay', handleCanPlay);
+    
+    // Intelligent preload
+    if (document.readyState === 'complete') {
+      video.load();
+    } else {
+      window.addEventListener('load', () => video.load());
+    }
+
+    return () => {
+      video.removeEventListener('canplay', handleCanPlay);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* Optimized video */}
+      <video
+        ref={videoRef}
+        src="/video/background-mobile.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="none"
+        className={`absolute lg:fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+      
+      {/* Placeholder that fades out */}
+      <div 
+        className={`absolute inset-0 bg-linear-to-br from-blue-900 via-blue-800 to-purple-900 -z-10 transition-opacity duration-500 ${
+          isLoaded ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+    </>
+  );
+}
+```
+
+## Props
+
+The OptimizedVideo component doesn't accept props currently, but can be extended:
+
+<ParamField path="src" type="string" default="/video/background-mobile.mp4">
+  Video file path
+</ParamField>
+
+<ParamField path="placeholder" type="string" default="gradient">
+  Placeholder style while loading
+</ParamField>
+
+<ParamField path="autoPlay" type="boolean" default={true}>
+  Start playing automatically
+</ParamField>
+
+<ParamField path="loop" type="boolean" default={true}>
+  Loop video continuously
+</ParamField>
+
+<ParamField path="muted" type="boolean" default={true}>
+  Mute audio (required for autoplay)
+</ParamField>
+
+## Performance Optimizations
+
+### Lazy Loading Strategy
+
+```tsx
+if (document.readyState === 'complete') {
+  video.load();
+} else {
+  window.addEventListener('load', () => video.load());
+}
+```
+
+The video only starts loading after the page is fully loaded, prioritizing critical resources.
+
+### Preload Attribute
+
+```html
+<video preload="none" />
+```
+
+Prevents the browser from automatically downloading video metadata.
+
+### Transition Effects
+
+```css
+transition-opacity duration-500
+```
+
+Smooth 500ms fade transition between placeholder and video.
+
+### Mobile Positioning
+
+```css
+absolute lg:fixed
+```
+
+- Mobile: `absolute` positioning within section
+- Desktop: `fixed` positioning for parallax effect
+
+## Styling
+
+### Video Overlay
+
+```tsx
+<div className="absolute h-full inset-0 bg-black/50 -z-10" />
+```
+
+Creates a 50% opacity black overlay to improve text contrast.
+
+### Placeholder Gradient
+
+```css
+bg-linear-to-br from-blue-900 via-blue-800 to-purple-900
+```
+
+Brand-colored gradient placeholder matches the video aesthetic.
+
+### Responsive Typography
+
+```tsx
+text-4xl 2xl:text-7xl mb-8
+text-lg md:text-2xl 2xl:text-3xl
+```
+
+Text scales from mobile to large desktop screens.
+
+## Accessibility
+
+- Video is muted by default (required for autoplay)
+- Overlay ensures text remains readable
+- Placeholder provides visual feedback during load
+- `playsInline` attribute for iOS compatibility
+
+## Usage Example
+
+```tsx
+import OptimizedVideo from '@/components/optimized-video';
+
+export default function HeroSection() {
+  return (
+    <section className="relative h-screen">
+      <OptimizedVideo />
+      <div className="absolute inset-0 bg-black/50" />
+      <div className="relative z-10 flex items-center justify-center h-full">
+        <h1>Your Hero Content</h1>
+      </div>
+    </section>
+  );
+}
+```
+
+## Video Requirements
+
+- **Format**: MP4 (H.264 codec recommended)
+- **Resolution**: 1920x1080 or lower for mobile
+- **File Size**: Optimize for web (target < 5MB)
+- **Duration**: Short loops work best (5-15 seconds)
+- **Aspect Ratio**: 16:9 recommended
+
+## Browser Support
+
+- Chrome/Edge: Full support
+- Firefox: Full support
+- Safari: Full support (with `playsInline`)
+- Mobile browsers: Optimized with fallback

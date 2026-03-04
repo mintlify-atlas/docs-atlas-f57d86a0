@@ -1,0 +1,759 @@
+---
+title: Carousels
+description: Implementing Embla Carousel for products and offers in Eufrosine
+---
+
+# Carousels
+
+Eufrosine uses **Embla Carousel** to create smooth, touch-enabled carousels for displaying products and special offers. Embla is a lightweight, framework-agnostic carousel library with excellent mobile support.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Touch Enabled" icon="hand-pointer">
+    Native touch and swipe support for mobile devices
+  </Card>
+  <Card title="Responsive" icon="mobile">
+    Carousel on mobile, grid on desktop
+  </Card>
+  <Card title="Lightweight" icon="feather">
+    Only ~2KB gzipped with no dependencies
+  </Card>
+  <Card title="Customizable" icon="paintbrush">
+    Full control over styling and behavior
+  </Card>
+</CardGroup>
+
+---
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install embla-carousel-react
+```
+
+```bash yarn
+yarn add embla-carousel-react
+```
+
+```bash pnpm
+pnpm add embla-carousel-react
+```
+</CodeGroup>
+
+**Current Version:** `embla-carousel-react@8.6.0`
+
+---
+
+## Implementation
+
+### 1. Offers Carousel
+
+The offers carousel displays promotional packages with pricing and WhatsApp integration.
+
+<Tabs>
+  <Tab title="Component">
+    ```tsx components/offersCarousel.tsx
+    import { useCallback, useEffect, useState } from "react";
+    import { offers } from "./offers";
+    import { CheckCircle } from "lucide-react";
+    import useEmblaCarousel from "embla-carousel-react";
+    import clsx from "clsx";
+    import { Badge } from "./ui/badge";
+    
+    function OffersCarousel() {
+      const phone = "51903565918";
+      const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+      const [selectedIndex, setSelectedIndex] = useState(0);
+      const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+    
+      // WhatsApp link generator
+      const getWhatsAppUrl = (message: string) =>
+        `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(
+          message
+        )}`;
+    
+      // Scroll to specific slide
+      const scrollTo = useCallback(
+        (index: number) => {
+          emblaApi && emblaApi.scrollTo(index);
+        },
+        [emblaApi]
+      );
+    
+      // Update selected index on scroll
+      const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+      }, [emblaApi]);
+    
+      // Initialize carousel
+      useEffect(() => {
+        if (!emblaApi) return;
+    
+        setScrollSnaps(emblaApi.scrollSnapList());
+        emblaApi.on("select", onSelect);
+        onSelect();
+    
+        return () => {
+          emblaApi.off("select", onSelect);
+        };
+      }, [emblaApi, onSelect]);
+    
+      return (
+        <>
+          {/* Desktop: Grid Layout */}
+          <div className="hidden md:flex justify-center items-center gap-6 lg:gap-12 p-4">
+            {offers.map((offer) => (
+              <div key={offer.id} className="bg-white p-4 lg:p-6 rounded-[40px]">
+                <h2 className="text-lg font-bold text-center">{offer.title}</h2>
+                <p className="text-2xl text-center font-bold text-blue-600">
+                  {offer.price}
+                </p>
+                <ul className="space-y-2 text-sm">
+                  {offer.details.map((detail, i) => (
+                    <li key={i} className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-blue-600 mr-2" />
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={getWhatsAppUrl(offer.whatsappMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="w-full py-2 rounded-full bg-[#1F01B9] text-white">
+                    Solicitar ahora
+                  </button>
+                </a>
+              </div>
+            ))}
+          </div>
+    
+          {/* Mobile: Carousel */}
+          <div className="block md:hidden relative">
+            <div className="overflow-hidden py-8" ref={emblaRef}>
+              <div className="flex">
+                {offers.map((offer) => (
+                  <div key={offer.id} className="flex-[0_0_80%] min-w-0 pl-5 pr-5">
+                    <div className="bg-white rounded-[40px] p-4">
+                      {/* Offer content */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+    
+            {/* Dot Navigation */}
+            <div className="flex justify-center gap-2 -mt-2">
+              {offers.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => scrollTo(i)}
+                  className={clsx(
+                    "w-2 h-2 rounded-full transition-all",
+                    i === selectedIndex ? "bg-[#1F01B9] w-4" : "bg-gray-300"
+                  )}
+                  aria-label={`Ir a oferta ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      );
+    }
+    
+    export default OffersCarousel;
+    ```
+  </Tab>
+  <Tab title="Key Features">
+    **Responsive Design:**
+    - Desktop: Static grid layout
+    - Mobile: Touch-enabled carousel
+    
+    **Carousel Configuration:**
+    ```tsx
+    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+    ```
+    - `loop: false` - No infinite looping
+    - `emblaRef` - Attach to carousel container
+    - `emblaApi` - Control carousel programmatically
+    
+    **Dot Navigation:**
+    - Active dot expands (`w-4`)
+    - Inactive dots remain small (`w-2`)
+    - Click to navigate to specific slide
+    
+    **WhatsApp Integration:**
+    - Each offer has a WhatsApp link
+    - Pre-filled message with offer details
+    - Opens in new tab
+  </Tab>
+</Tabs>
+
+---
+
+### 2. Products Carousel
+
+The products carousel displays water bottle presentations with pricing.
+
+<Tabs>
+  <Tab title="Component">
+    ```tsx components/productsCarousel.tsx
+    import { BadgeCheckIcon } from "lucide-react";
+    import { Products } from "./products";
+    import { formatPrice } from "./utils/formatters";
+    import { Badge } from "@/components/ui/badge";
+    import useEmblaCarousel from "embla-carousel-react";
+    import { useCallback, useEffect, useState } from "react";
+    import clsx from "clsx";
+    
+    function PresentationsCarousel() {
+      const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+      const [selectedIndex, setSelectedIndex] = useState(0);
+    
+      const scrollTo = useCallback(
+        (index: number) => {
+          emblaApi && emblaApi.scrollTo(index);
+        },
+        [emblaApi]
+      );
+    
+      const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+      }, [emblaApi]);
+    
+      useEffect(() => {
+        if (!emblaApi) return;
+        emblaApi.on("select", onSelect);
+        onSelect();
+        return () => {
+          emblaApi.off("select", onSelect);
+        };
+      }, [emblaApi, onSelect]);
+    
+      return (
+        <>
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 px-6 gap-6">
+            {Products.map((product, i) => (
+              <div key={i} className="group flex items-center rounded-[40px] bg-white">
+                {/* Product image with zoom effect */}
+                <div className="overflow-hidden">
+                  <div className="transition-transform duration-700 lg:group-hover:scale-135">
+                    {product.image}
+                  </div>
+                </div>
+    
+                {/* Product details */}
+                <div className="p-4 w-2/3 flex flex-col justify-between">
+                  <h3 className="text-2xl font-semibold text-[#1F01B9]">
+                    {product.title}
+                  </h3>
+                  <p className="text-gray-700">{product.description}</p>
+                  <p className="text-xl font-bold text-blue-600">
+                    {formatPrice(product.price)}
+                  </p>
+                  <Badge variant="secondary">
+                    <BadgeCheckIcon />
+                    {product.amount}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+    
+          {/* Mobile: Carousel */}
+          <div className="block md:hidden relative">
+            <div className="overflow-hidden py-8" ref={emblaRef}>
+              <div className="flex">
+                {Products.map((product, i) => (
+                  <div key={i} className="flex-[0_0_70%] pl-5 pr-5">
+                    <div className="group flex flex-col rounded-[40px] bg-white">
+                      {/* Image */}
+                      <div className="overflow-hidden rounded-t-[40px]">
+                        {product.image}
+                      </div>
+    
+                      {/* Badge positioned over image */}
+                      <div className="relative -top-42 left-24">
+                        <Badge variant="secondary" className="bg-blue-500 text-white">
+                          <BadgeCheckIcon className="w-3 h-3 mr-1" />
+                          {product.amount}
+                        </Badge>
+                      </div>
+    
+                      {/* Content */}
+                      <div className="px-6 pb-6 flex flex-col">
+                        <h3 className="text-base font-semibold text-[#1F01B9]">
+                          {product.title}
+                        </h3>
+                        <p className="text-gray-700 text-xs">
+                          {product.description}
+                        </p>
+                        <p className="text-lg font-extrabold text-blue-600">
+                          {formatPrice(product.price)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+    
+            {/* Dot Navigation */}
+            <div className="flex justify-center gap-2 -mt-2">
+              {Products.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => scrollTo(i)}
+                  className={clsx(
+                    "w-2 h-2 rounded-full transition-all",
+                    i === selectedIndex ? "bg-[#1F01B9] w-4" : "bg-gray-300"
+                  )}
+                  aria-label={`Ir a producto ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      );
+    }
+    
+    export default PresentationsCarousel;
+    ```
+  </Tab>
+  <Tab title="Unique Features">
+    **Image Hover Effect:**
+    ```tsx
+    <div className="group">
+      <div className="overflow-hidden">
+        <div className="transition-transform duration-700 lg:group-hover:scale-135">
+          {product.image}
+        </div>
+      </div>
+    </div>
+    ```
+    - Image scales to 135% on hover
+    - Smooth 700ms transition
+    - Only on desktop (large screens)
+    
+    **Badge Positioning:**
+    ```tsx
+    <div className="relative -top-42 left-24">
+      <Badge>{product.amount}</Badge>
+    </div>
+    ```
+    - Badge overlays the product image
+    - Custom positioning for visual appeal
+    
+    **Price Formatting:**
+    ```tsx
+    import { formatPrice } from "./utils/formatters";
+    
+    {formatPrice(product.price)}
+    ```
+    - Consistent currency formatting
+    - Centralized utility function
+  </Tab>
+</Tabs>
+
+---
+
+## Carousel Configuration
+
+### Basic Setup
+
+```tsx
+import useEmblaCarousel from "embla-carousel-react";
+
+function MyCarousel() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,           // Disable infinite loop
+    align: 'start',        // Align slides to start
+    containScroll: 'trimSnaps', // Trim snap points
+    dragFree: false,       // Snap to slides (not free drag)
+    slidesToScroll: 1,     // Scroll one slide at a time
+  });
+  
+  return (
+    <div className="overflow-hidden" ref={emblaRef}>
+      <div className="flex">
+        {/* Slides */}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Slide Sizing
+
+### Flexible Slide Width
+
+```tsx
+<div className="flex-[0_0_80%] min-w-0 pl-5 pr-5">
+  {/* Slide content */}
+</div>
+```
+
+**Breakdown:**
+- `flex-[0_0_80%]` - Slide takes 80% of container width
+- `min-w-0` - Prevents slide from expanding
+- `pl-5 pr-5` - Padding for spacing between slides
+
+<Tabs>
+  <Tab title="Common Widths">
+    ```tsx
+    // Show 1.2 slides (current implementation)
+    flex-[0_0_80%]
+    
+    // Show exactly 1 slide
+    flex-[0_0_100%]
+    
+    // Show 1.5 slides
+    flex-[0_0_66%]
+    
+    // Show 2 slides
+    flex-[0_0_50%]
+    
+    // Show 3 slides
+    flex-[0_0_33.33%]
+    ```
+  </Tab>
+  <Tab title="Responsive Widths">
+    ```tsx
+    <div className="
+      flex-[0_0_90%] 
+      sm:flex-[0_0_80%] 
+      md:flex-[0_0_60%] 
+      lg:flex-[0_0_50%]
+    ">
+      {/* Responsive slide width */}
+    </div>
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Navigation
+
+### Dot Indicators
+
+```tsx
+const [selectedIndex, setSelectedIndex] = useState(0);
+
+const onSelect = useCallback(() => {
+  if (!emblaApi) return;
+  setSelectedIndex(emblaApi.selectedScrollSnap());
+}, [emblaApi]);
+
+useEffect(() => {
+  if (!emblaApi) return;
+  emblaApi.on("select", onSelect);
+  return () => emblaApi.off("select", onSelect);
+}, [emblaApi, onSelect]);
+
+return (
+  <div className="flex justify-center gap-2">
+    {items.map((_, i) => (
+      <button
+        key={i}
+        onClick={() => emblaApi?.scrollTo(i)}
+        className={clsx(
+          "w-2 h-2 rounded-full transition-all",
+          i === selectedIndex ? "bg-blue-600 w-4" : "bg-gray-300"
+        )}
+      />
+    ))}
+  </div>
+);
+```
+
+### Arrow Navigation
+
+```tsx
+const scrollPrev = useCallback(() => {
+  if (emblaApi) emblaApi.scrollPrev();
+}, [emblaApi]);
+
+const scrollNext = useCallback(() => {
+  if (emblaApi) emblaApi.scrollNext();
+}, [emblaApi]);
+
+return (
+  <>
+    <button onClick={scrollPrev}>Previous</button>
+    <button onClick={scrollNext}>Next</button>
+  </>
+);
+```
+
+---
+
+## Responsive Patterns
+
+### Carousel on Mobile, Grid on Desktop
+
+```tsx
+function ResponsiveCarousel() {
+  return (
+    <>
+      {/* Desktop: Grid */}
+      <div className="hidden md:grid grid-cols-3 gap-6">
+        {items.map((item) => <Card key={item.id} {...item} />)}
+      </div>
+      
+      {/* Mobile: Carousel */}
+      <div className="block md:hidden">
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {items.map((item) => (
+              <div key={item.id} className="flex-[0_0_80%] px-4">
+                <Card {...item} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+```
+
+<Note>
+  This pattern provides the best UX: touch navigation on mobile, overview on desktop.
+</Note>
+
+---
+
+## Performance Optimization
+
+<Accordion title="Prevent Layout Shift">
+  ### Add `will-change-transform`
+  
+  ```tsx
+  <div className="flex-[0_0_80%] will-change-transform">
+    {/* Slide content */}
+  </div>
+  ```
+  
+  This hints to the browser that the element will be animated.
+</Accordion>
+
+<Accordion title="Lazy Load Images">
+  ```tsx
+  <img
+    src={product.image}
+    loading="lazy"
+    alt={product.title}
+  />
+  ```
+  
+  Only loads images as they come into view.
+</Accordion>
+
+<Accordion title="Optimize Transitions">
+  ```css
+  .embla__slide {
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .embla__slide {
+      transition: none;
+    }
+  }
+  ```
+</Accordion>
+
+---
+
+## Advanced Features
+
+### Auto-Play
+
+```tsx
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+
+function AutoPlayCarousel() {
+  const [emblaRef] = useEmblaCarousel(
+    { loop: true },
+    [Autoplay({ delay: 3000, stopOnInteraction: false })]
+  );
+  
+  return (
+    <div className="overflow-hidden" ref={emblaRef}>
+      {/* Slides */}
+    </div>
+  );
+}
+```
+
+### Infinite Loop
+
+```tsx
+const [emblaRef] = useEmblaCarousel({ loop: true });
+```
+
+<Warning>
+  Infinite loop requires at least 3 slides for smooth operation.
+</Warning>
+
+### Free Scroll (No Snapping)
+
+```tsx
+const [emblaRef] = useEmblaCarousel({
+  dragFree: true,
+  containScroll: false,
+});
+```
+
+---
+
+## Accessibility
+
+### Keyboard Navigation
+
+Embla supports keyboard navigation by default:
+- `Arrow Left/Right` - Navigate between slides
+- `Tab` - Focus navigation buttons
+- `Enter/Space` - Activate buttons
+
+### ARIA Labels
+
+```tsx
+<button
+  onClick={() => scrollTo(i)}
+  aria-label={`Go to slide ${i + 1}`}
+  aria-current={i === selectedIndex ? "true" : "false"}
+>
+  {/* Dot */}
+</button>
+```
+
+### Focus Management
+
+```tsx
+const focusedSlide = useCallback(() => {
+  if (!emblaApi) return;
+  const node = emblaApi.slideNodes()[selectedIndex];
+  node?.focus();
+}, [emblaApi, selectedIndex]);
+```
+
+---
+
+## Styling
+
+### Custom Styles
+
+```tsx
+// Carousel container
+<div className="overflow-hidden py-8" ref={emblaRef}>
+  {/* Slides container */}
+  <div className="flex">
+    {/* Individual slides */}
+    <div className="flex-[0_0_80%] min-w-0 pl-5 pr-5">
+      {/* Slide content with shadow */}
+      <div className="rounded-[40px] shadow-lg">
+        {/* Content */}
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Active Slide Styling
+
+```tsx
+const [selectedIndex, setSelectedIndex] = useState(0);
+
+return (
+  <div className="flex">
+    {items.map((item, i) => (
+      <div
+        className={clsx(
+          "flex-[0_0_80%] transition-opacity",
+          i === selectedIndex ? "opacity-100" : "opacity-50"
+        )}
+      >
+        {/* Slide content */}
+      </div>
+    ))}
+  </div>
+);
+```
+
+---
+
+## Troubleshooting
+
+<Accordion title="Carousel not scrolling">
+  1. Check that `overflow-hidden` is on the container
+  2. Verify `ref={emblaRef}` is attached correctly
+  3. Ensure slides have explicit width (`flex-[0_0_80%]`)
+  4. Check that `emblaApi` is initialized
+  5. Verify content is wider than container
+</Accordion>
+
+<Accordion title="Slides not aligning">
+  1. Add `min-w-0` to slide elements
+  2. Check for conflicting CSS
+  3. Verify flex values are correct
+  4. Use `align: 'start'` in options
+  5. Check padding/margin on slides
+</Accordion>
+
+<Accordion title="Touch not working on mobile">
+  1. Remove conflicting touch event handlers
+  2. Check for `touch-action: none` CSS
+  3. Verify carousel is not inside a scrollable parent
+  4. Test on actual device, not emulator
+  5. Check for JavaScript errors
+</Accordion>
+
+---
+
+## API Reference
+
+### Embla API Methods
+
+```tsx
+emblaApi.scrollNext()              // Next slide
+emblaApi.scrollPrev()              // Previous slide
+emblaApi.scrollTo(index)           // Go to specific slide
+emblaApi.canScrollNext()           // Can scroll forward?
+emblaApi.canScrollPrev()           // Can scroll backward?
+emblaApi.selectedScrollSnap()      // Current slide index
+emblaApi.scrollSnapList()          // Array of snap points
+emblaApi.on('select', callback)    // Listen to select event
+emblaApi.off('select', callback)   // Remove event listener
+emblaApi.destroy()                 // Cleanup
+```
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Embla Carousel Docs" icon="book" href="https://www.embla-carousel.com/">
+    Official documentation and examples
+  </Card>
+  <Card title="React Integration" icon="react" href="https://www.embla-carousel.com/get-started/react/">
+    React-specific guide
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- [Animations →](/features/animations)
+- [Smooth Scroll →](/features/smooth-scroll)
+- [Contact Form →](/features/contact-form)

@@ -1,0 +1,661 @@
+---
+title: 'UI Components'
+description: 'Reusable UI components including Badge, Card, Label, Spinning Text, and Glowing Effect'
+---
+
+# UI Components
+
+The Eufrosine project includes a collection of reusable UI components built with Radix UI primitives and Tailwind CSS.
+
+## Components Directory
+
+All UI components are located in `components/ui/`:
+
+- `badge.tsx` - Flexible badge component with variants
+- `card.tsx` - Modular card component system
+- `label.tsx` - Accessible form label component
+- `spinning-text.tsx` - Animated circular text component
+- `glowing-effect.tsx` - Interactive glowing border effect
+
+---
+
+## Badge
+
+Location: `components/ui/badge.tsx`
+
+### Description
+
+A versatile badge component with multiple style variants for displaying status, tags, or highlights.
+
+### Features
+
+- Built with Radix UI Slot for composition
+- Multiple style variants (default, secondary, destructive, outline)
+- CVA (Class Variance Authority) for variant management
+- Icon support with automatic sizing
+- Focus states for accessibility
+- Responsive design
+
+### Usage
+
+```tsx
+import { Badge } from "@/components/ui/badge";
+import { BadgeCheckIcon } from "lucide-react";
+
+// Basic usage
+<Badge>New</Badge>
+
+// With variant
+<Badge variant="secondary">Featured</Badge>
+
+// With icon
+<Badge className="bg-blue-500 text-white">
+  <BadgeCheckIcon />
+  Verified
+</Badge>
+
+// Custom styling
+<Badge className="bg-green-600 text-white">In Stock</Badge>
+```
+
+### Props
+
+<ParamField path="variant" type="string" default="default">
+  Badge style variant: `default`, `secondary`, `destructive`, or `outline`
+</ParamField>
+
+<ParamField path="asChild" type="boolean" default={false}>
+  Use Radix Slot for composition
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+### Variants
+
+#### Default
+
+```tsx
+<Badge variant="default">Default Badge</Badge>
+```
+
+Primary brand colors with border.
+
+#### Secondary
+
+```tsx
+<Badge variant="secondary">Secondary Badge</Badge>
+```
+
+Subtle background for secondary information.
+
+#### Destructive
+
+```tsx
+<Badge variant="destructive">Error</Badge>
+```
+
+Red styling for errors or warnings.
+
+#### Outline
+
+```tsx
+<Badge variant="outline">Outline Badge</Badge>
+```
+
+Transparent with border.
+
+### Source Code
+
+```tsx
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary: "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        destructive: "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+      },
+    },
+    defaultVariants: { variant: "default" },
+  }
+)
+
+function Badge({
+  className,
+  variant,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"span"> & VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot : "span"
+  return <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} />
+}
+
+export { Badge, badgeVariants }
+```
+
+---
+
+## Card
+
+Location: `components/ui/card.tsx`
+
+### Description
+
+A modular card component system with subcomponents for building structured content containers.
+
+### Subcomponents
+
+- `Card` - Main container
+- `CardHeader` - Header section with title/description
+- `CardTitle` - Card title
+- `CardDescription` - Card description
+- `CardAction` - Action button area in header
+- `CardContent` - Main content area
+- `CardFooter` - Footer section
+
+### Usage
+
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+    <CardDescription>Card description goes here</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Main content area</p>
+  </CardContent>
+  <CardFooter>
+    <button>Action</button>
+  </CardFooter>
+</Card>
+```
+
+### Advanced Example
+
+```tsx
+<Card className="max-w-md">
+  <CardHeader>
+    <CardTitle>Product Details</CardTitle>
+    <CardDescription>Complete product information</CardDescription>
+    <CardAction>
+      <button>Edit</button>
+    </CardAction>
+  </CardHeader>
+  <CardContent>
+    <dl className="space-y-2">
+      <dt className="font-semibold">Price:</dt>
+      <dd>$29.99</dd>
+      <dt className="font-semibold">Stock:</dt>
+      <dd>In Stock</dd>
+    </dl>
+  </CardContent>
+  <CardFooter>
+    <button className="w-full">Add to Cart</button>
+  </CardFooter>
+</Card>
+```
+
+### Props
+
+All subcomponents accept standard HTML div props plus:
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+### Source Code Excerpt
+
+```tsx
+function Card({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card"
+      className={cn(
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-header"
+      className={cn(
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+```
+
+---
+
+## Label
+
+Location: `components/ui/label.tsx`
+
+### Description
+
+An accessible form label component built on Radix UI Label primitive.
+
+### Features
+
+- Built with Radix UI for accessibility
+- Automatic disabled state handling
+- Peer-aware (syncs with form inputs)
+- Gap support for icons
+- Non-selectable text
+
+### Usage
+
+```tsx
+import { Label } from "@/components/ui/label";
+
+<Label htmlFor="email">Email Address</Label>
+<input id="email" type="email" />
+
+// With icon
+<Label htmlFor="name">
+  <UserIcon className="w-4 h-4" />
+  Full Name
+</Label>
+```
+
+### Form Example
+
+```tsx
+<div className="space-y-2">
+  <Label htmlFor="username" className="text-sm font-medium">
+    Username
+  </Label>
+  <input
+    id="username"
+    className="w-full px-4 py-2 border rounded"
+    placeholder="Enter username"
+  />
+</div>
+```
+
+### Props
+
+<ParamField path="htmlFor" type="string">
+  ID of the associated form element
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+### Source Code
+
+```tsx
+"use client"
+
+import * as React from "react"
+import * as LabelPrimitive from "@radix-ui/react-label"
+import { cn } from "@/lib/utils"
+
+function Label({
+  className,
+  ...props
+}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+  return (
+    <LabelPrimitive.Root
+      data-slot="label"
+      className={cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export { Label }
+```
+
+---
+
+## Spinning Text
+
+Location: `components/ui/spinning-text.tsx`
+
+### Description
+
+An animated component that displays text in a circular, continuously rotating pattern.
+
+### Features
+
+- Circular text layout
+- Continuous rotation animation
+- Customizable radius and duration
+- Reverse rotation support
+- Framer Motion powered
+- Screen reader friendly
+
+### Usage
+
+```tsx
+import { SpinningText } from "@/components/ui/spinning-text";
+
+// Basic usage
+<SpinningText>
+  Scroll Down • Learn More • Scroll Down •
+</SpinningText>
+
+// With custom props
+<SpinningText 
+  radius={5} 
+  duration={10} 
+  reverse={false}
+  className="text-sm font-medium"
+>
+  Get Your Gift • Make Your Order •
+</SpinningText>
+```
+
+### Props
+
+<ParamField path="children" type="string | string[]" required>
+  Text to display in circular pattern
+</ParamField>
+
+<ParamField path="radius" type="number" default={5}>
+  Radius of the circular text path (in character units)
+</ParamField>
+
+<ParamField path="duration" type="number" default={10}>
+  Animation duration in seconds
+</ParamField>
+
+<ParamField path="reverse" type="boolean" default={false}>
+  Rotate counter-clockwise instead of clockwise
+</ParamField>
+
+<ParamField path="transition" type="Transition">
+  Custom Framer Motion transition object
+</ParamField>
+
+<ParamField path="variants" type="object">
+  Custom Framer Motion variants for container and items
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+### Examples
+
+#### Gift Badge
+
+```tsx
+<div className="relative">
+  <SpinningText 
+    className="text-sm md:text-base font-normal md:font-medium" 
+    radius={5}
+  >
+    Haz tu pedido y recibe tu regalo •
+  </SpinningText>
+  <img src="/img/gift.png" alt="Gift" className="absolute bottom-0 left-1/2 -translate-x-1/2" />
+</div>
+```
+
+#### Loading Indicator
+
+```tsx
+<SpinningText 
+  radius={3} 
+  duration={2} 
+  className="text-blue-600"
+>
+  Loading...
+</SpinningText>
+```
+
+### Source Code Excerpt
+
+```tsx
+export function SpinningText({
+  children,
+  duration = 10,
+  reverse = false,
+  radius = 5,
+  transition,
+  variants,
+  className,
+  style,
+}: SpinningTextProps) {
+  const letters = children.split("");
+  letters.push(" ");
+
+  const finalTransition: Transition = {
+    ...BASE_TRANSITION,
+    ...transition,
+    duration: (transition as { duration?: number })?.duration ?? duration,
+  };
+
+  const containerVariants: Variants = {
+    visible: { rotate: reverse ? -360 : 360 },
+    ...variants?.container,
+  };
+
+  return (
+    <motion.div
+      className={cn("relative", className)}
+      style={{ ...style }}
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      transition={finalTransition}
+    >
+      {letters.map((letter, index) => (
+        <motion.span
+          aria-hidden="true"
+          key={`${index}-${letter}`}
+          className="absolute top-1/2 left-1/2 inline-block"
+          style={{
+            "--index": index,
+            "--total": letters.length,
+            "--radius": radius,
+            transform: `
+              translate(-50%, -50%)
+              rotate(calc(360deg / var(--total) * var(--index)))
+              translateY(calc(var(--radius, 5) * -1ch))
+            `,
+          }}
+        >
+          {letter}
+        </motion.span>
+      ))}
+      <span className="sr-only">{children}</span>
+    </motion.div>
+  );
+}
+```
+
+---
+
+## Glowing Effect
+
+Location: `components/ui/glowing-effect.tsx`
+
+### Description
+
+An interactive glowing border effect that follows the mouse cursor with smooth animations.
+
+### Features
+
+- Mouse-tracking glow animation
+- Customizable blur, spread, and proximity
+- Inactive zone in center
+- White and colored variants
+- GPU-accelerated animations
+- Smooth Framer Motion transitions
+
+### Usage
+
+```tsx
+import { GlowingEffect } from "@/components/ui/glowing-effect";
+
+<div className="relative p-6 rounded-xl bg-gray-900">
+  <GlowingEffect 
+    blur={0}
+    spread={20}
+    proximity={100}
+    disabled={false}
+  />
+  <div className="relative z-10">
+    Content with glowing border
+  </div>
+</div>
+```
+
+### Props
+
+<ParamField path="blur" type="number" default={0}>
+  Blur amount in pixels
+</ParamField>
+
+<ParamField path="inactiveZone" type="number" default={0.7}>
+  Center zone where glow is inactive (0-1)
+</ParamField>
+
+<ParamField path="proximity" type="number" default={0}>
+  Distance from element where glow activates (pixels)
+</ParamField>
+
+<ParamField path="spread" type="number" default={20}>
+  Angular spread of the glow gradient
+</ParamField>
+
+<ParamField path="variant" type="string" default="default">
+  Color variant: `default` (colorful) or `white`
+</ParamField>
+
+<ParamField path="glow" type="boolean" default={false}>
+  Always show glow (disable mouse tracking)
+</ParamField>
+
+<ParamField path="disabled" type="boolean" default={true}>
+  Disable the glow effect entirely
+</ParamField>
+
+<ParamField path="movementDuration" type="number" default={2}>
+  Animation duration in seconds
+</ParamField>
+
+<ParamField path="borderWidth" type="number" default={1}>
+  Border width in pixels
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+### Examples
+
+#### Interactive Card
+
+```tsx
+<div className="relative rounded-2xl bg-gray-900 p-8">
+  <GlowingEffect
+    blur={20}
+    spread={30}
+    proximity={150}
+    variant="default"
+    disabled={false}
+  />
+  <h3 className="relative z-10 text-white">Hover to see effect</h3>
+</div>
+```
+
+#### Always-On Glow
+
+```tsx
+<div className="relative rounded-xl bg-black p-6">
+  <GlowingEffect
+    glow={true}
+    variant="white"
+    blur={10}
+  />
+  <p className="relative z-10 text-white">Always glowing</p>
+</div>
+```
+
+### Technical Details
+
+The component uses:
+
+- CSS custom properties for dynamic values
+- `requestAnimationFrame` for smooth tracking
+- Framer Motion for angle interpolation
+- Conic gradients for the glow effect
+- Mask compositing for border effect
+
+### Performance
+
+Optimizations include:
+
+- Debounced animation frames
+- Inactive zone to reduce calculations
+- GPU-accelerated transforms
+- Conditional event listeners
+- Memoized component
+
+---
+
+## Common Utilities
+
+All components use the `cn()` utility for class name merging:
+
+```tsx
+import { cn } from "@/lib/utils";
+
+// Combines and deduplicates class names
+const className = cn(
+  "base-class",
+  condition && "conditional-class",
+  customClassName
+);
+```
+
+## Dependencies
+
+- `@radix-ui/react-slot` - Composition primitive
+- `@radix-ui/react-label` - Accessible labels
+- `class-variance-authority` - Variant management
+- `framer-motion` / `motion/react` - Animations
+- `lucide-react` - Icon library
+- `tailwindcss` - Styling
+
+## Accessibility Features
+
+- ARIA attributes on interactive elements
+- Screen reader support with `sr-only` content
+- Focus visible states
+- Disabled state handling
+- Semantic HTML structure
+- Keyboard navigation support

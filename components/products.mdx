@@ -1,0 +1,344 @@
+---
+title: 'Products Carousel'
+description: 'Responsive carousel component displaying water bottle presentations with pricing'
+---
+
+# Products Carousel
+
+The Products Carousel displays water bottle presentations in a responsive layout - a grid on desktop and a touch-friendly carousel on mobile.
+
+## Location
+
+- **Component**: `components/productsCarousel.tsx`
+- **Data**: `components/products.tsx`
+
+## Features
+
+- Responsive design (grid on desktop, carousel on mobile)
+- Touch-friendly swiping with Embla Carousel
+- Hover zoom effects on images
+- Price formatting utility
+- Badge integration for delivery info
+- Dot indicators for carousel navigation
+
+## Component Structure
+
+```tsx
+import { BadgeCheckIcon } from "lucide-react";
+import { Products } from "./products";
+import { formatPrice } from "./utils/formatters";
+import { Badge } from "@/components/ui/badge";
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback, useEffect, useState } from "react";
+import clsx from "clsx";
+
+function PresentationsCarousel() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+
+  // Carousel controls
+  const scrollTo = useCallback(
+    (index: number) => {
+      emblaApi && emblaApi.scrollTo(index);
+    },
+    [emblaApi]
+  );
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    setScrollSnaps(emblaApi.scrollSnapList());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  return (
+    <>
+      {/* Desktop Grid */}
+      {/* Mobile Carousel */}
+    </>
+  );
+}
+```
+
+## Products Data Structure
+
+Location: `components/products.tsx`
+
+```tsx
+export const Products = [
+  {
+    image: <img src="/img/presentacion500ml.webp" alt="Botella 500ml" className="w-60 h-50 md:w-60 md:h-55 object-cover rounded-t-[30px] md:rounded-l-[40px] md:rounded-t-none" />,
+    title: "Pack Botella 625ml",
+    description: "Pack de 15 unidades de botella de 625ml.",
+    price: 10,
+    amount: "Envio gratuito",
+  },
+  {
+    image: <img src="/img/presentacion10lt.webp" alt="Botella 7 litros" className="w-60 h-50 md:w-60 md:h-55 object-cover rounded-t-[30px] md:rounded-l-[40px] md:rounded-t-none" />,
+    title: "Botellon 7 Lts",
+    description: "Botellón de 7 Litros no retornable (no incluye valvula de abertura y cierre).",
+    price: 5,
+    amount: "Envio gratuito",
+  },
+  {
+    image: <img src="/img/presentacion20lt.webp" alt="Bidón 20 litros" className="w-60 h-50 md:w-60 md:h-55 object-cover rounded-t-[30px] md:rounded-l-[40px] md:rounded-t-none" />,
+    title: "Bidón 20 Lts",
+    description: "Bidón de 20 Litros (envase nuevo recargado).",
+    price: 30,
+    amount: "Envio gratuito",
+  },
+  {
+    image: <img src="/img/presentacion20lt.webp" alt="Bidón 10 litros" className="w-60 h-50 md:w-60 md:h-55 object-cover rounded-t-[30px] md:rounded-l-[40px] md:rounded-t-none" />,
+    title: "Recarga Bidón 20 Lts",
+    description: "Unicamente se recarga el bidón, no incluye envase.",
+    price: 12,
+    amount: "Envio gratuito",
+  },
+];
+```
+
+<ParamField path="Products[]" type="array">
+  Array of product objects
+</ParamField>
+
+<ParamField path="Products[].image" type="JSX.Element">
+  Product image component
+</ParamField>
+
+<ParamField path="Products[].title" type="string">
+  Product name
+</ParamField>
+
+<ParamField path="Products[].description" type="string">
+  Product description
+</ParamField>
+
+<ParamField path="Products[].price" type="number">
+  Price in local currency (numeric value)
+</ParamField>
+
+<ParamField path="Products[].amount" type="string">
+  Delivery information or quantity badge
+</ParamField>
+
+## Desktop Grid Layout
+
+```tsx
+<div className="hidden md:grid grid-cols-1 lg:grid-cols-2 px-6 gap-6 md:gap-12 mt-8 2xl:mt-10">
+  {Products.map((product, i) => (
+    <div
+      key={i}
+      className="group w-full h-auto flex items-center text-center rounded-[40px] bg-white overflow-hidden md:shadow-[8px_8px_16px_#c5c5c5,-8px_-8px_16px_#ffffff] lg:shadow-[15px_15px_30px_#bebebe,-15px_-15px_30px_#ffffff]"
+    >
+      {/* Image with zoom effect */}
+      <div className="overflow-hidden">
+        <div className="transition-transform duration-700 ease-out lg:group-hover:scale-135">
+          {product.image}
+        </div>
+      </div>
+
+      {/* Product details */}
+      <div className="p-4 w-2/3 h-full flex flex-col justify-between">
+        <div className="flex flex-col items-start gap-2">
+          <h3 className="text-lg sm:text-2xl text-start font-semibold text-[#1F01B9]">
+            {product.title}
+          </h3>
+          <p className="text-gray-700 text-start text-sm sm:text-base mb-4">
+            {product.description}
+          </p>
+        </div>
+        <div className="flex flex-col items-start gap-4">
+          <p className="text-xl font-bold text-blue-600">
+            {formatPrice(product.price)}
+          </p>
+          <Badge
+            variant="secondary"
+            className="bg-blue-500 text-white dark:bg-blue-600"
+          >
+            <BadgeCheckIcon />
+            {product.amount}
+          </Badge>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+```
+
+### Hover Effect
+
+```css
+group-hover:scale-135
+transition-transform duration-700 ease-out
+```
+
+Images scale to 135% on hover with a smooth 700ms transition.
+
+## Mobile Carousel Layout
+
+```tsx
+<div className="block md:hidden relative">
+  <div className="overflow-hidden py-8" ref={emblaRef}>
+    <div className="flex">
+      {Products.map((product, i) => (
+        <div key={i} className="flex-[0_0_70%] pl-5 pr-5">
+          <div className="group h-90 flex flex-col text-start rounded-[40px] bg-white overflow-hidden shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff] w-full will-change-transform">
+            {/* Image */}
+            <div className="overflow-hidden rounded-t-[40px]">
+              <div className="transition-transform duration-500 ease-out">
+                {product.image}
+              </div>
+            </div>
+
+            <div className="relative -top-42 left-24">
+              <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
+                <BadgeCheckIcon className="w-3 h-3 mr-1" />
+                {product.amount}
+              </Badge>
+            </div>
+
+            {/* Content */}
+            <div className="h-45 px-6 pb-6 flex flex-col justify-between">
+              <div className="flex flex-col items-start gap-3 mb-4">
+                <h3 className="text-base font-semibold text-[#1F01B9]">
+                  {product.title}
+                </h3>
+                <p className="text-gray-700 text-xs leading-relaxed">
+                  {product.description}
+                </p>
+              </div>
+              <div className="flex flex-col">
+                <p className="text-lg font-extrabold text-blue-600">
+                  {formatPrice(product.price)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Dot indicators */}
+  <div className="flex justify-center gap-2 -mt-2">
+    {Products.map((_, i) => (
+      <button
+        key={i}
+        onClick={() => scrollTo(i)}
+        className={clsx(
+          "w-2 h-2 rounded-full transition-all",
+          i === selectedIndex ? "bg-[#1F01B9] w-4" : "bg-gray-300"
+        )}
+        aria-label={`Ir a producto ${i + 1}`}
+      />
+    ))}
+  </div>
+</div>
+```
+
+### Carousel Configuration
+
+```tsx
+const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+```
+
+<ParamField path="loop" type="boolean" default={false}>
+  Disable infinite looping
+</ParamField>
+
+<ParamField path="flex-[0_0_70%]" type="CSS">
+  Each slide takes 70% of viewport width
+</ParamField>
+
+## Price Formatting
+
+Location: `components/utils/formatters.ts`
+
+```tsx
+export const formatPrice = (price: number): string => {
+  return `S/ ${price.toFixed(2)}`;
+};
+```
+
+Usage:
+
+```tsx
+import { formatPrice } from "./utils/formatters";
+
+<p className="text-xl font-bold text-blue-600">
+  {formatPrice(product.price)}
+</p>
+```
+
+## Usage Example
+
+In `app/page.tsx`:
+
+```tsx
+import PresentationsCarousel from "@/components/productsCarousel";
+
+<section id="productos" className="max-w-md sm:max-w-xl lg:max-w-5xl 2xl:max-w-7xl mx-auto pt-20 pb-10">
+  <div className="w-full h-full text-center px-4">
+    <h2 className="text-2xl md:text-4xl 2xl:text-5xl font-bold text-[#1F01B9] mb-3">
+      Nuestras Presentaciones
+    </h2>
+    <p className="text-sm md:text-base xl:text-lg 2xl:text-2xl text-gray-700">
+      Ya sea en casa, en el trabajo o durante tus actividades diarias,
+      nuestras presentaciones están pensadas para acompañarte siempre.
+    </p>
+  </div>
+  <PresentationsCarousel />
+</section>
+```
+
+## Dependencies
+
+- `embla-carousel-react` - Carousel functionality
+- `lucide-react` - BadgeCheckIcon
+- `clsx` - Conditional classes for indicators
+- `@/components/ui/badge` - Badge component
+- `@/components/utils/formatters` - Price formatting
+
+## Styling
+
+### Neumorphic Shadows
+
+```css
+/* Desktop */
+shadow-[15px_15px_30px_#bebebe,-15px_-15px_30px_#ffffff]
+
+/* Mobile */
+shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff]
+```
+
+Creates a 3D raised effect using dual shadows.
+
+### Border Radius
+
+```css
+rounded-[40px]
+```
+
+Large border radius for modern, soft aesthetics.
+
+## Accessibility
+
+- Dot indicators include `aria-label` attributes
+- Images include descriptive `alt` text
+- Touch-friendly hit targets for mobile buttons
+- Semantic HTML structure
+
+## Performance
+
+- `will-change-transform` optimizes carousel animations
+- Images use WebP format for smaller file sizes
+- Lazy loading can be added for off-screen products

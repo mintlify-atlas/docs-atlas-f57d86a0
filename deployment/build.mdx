@@ -1,0 +1,148 @@
+---
+title: "Build Process"
+description: "Learn how to build the Eufrosine project for production deployment"
+---
+
+## Overview
+
+The Eufrosine project is built using Next.js 16 with webpack bundler and requires proper configuration for production optimization.
+
+## Build Scripts
+
+The project includes the following npm scripts defined in `package.json:5-8`:
+
+```json
+{
+  "dev": "next dev --webpack",
+  "build": "next build --webpack",
+  "start": "next start"
+}
+```
+
+## Building for Production
+
+<Steps>
+  <Step title="Install Dependencies">
+    First, ensure all dependencies are installed:
+    
+    ```bash
+    npm install
+    ```
+  </Step>
+
+  <Step title="Set Environment Variables">
+    Configure all required environment variables before building. See the [Environment Variables](/deployment/environment) page for details.
+    
+    <Warning>
+      The build will succeed even without environment variables, but the application will fail at runtime when trying to send emails.
+    </Warning>
+  </Step>
+
+  <Step title="Run Build Command">
+    Execute the production build:
+    
+    ```bash
+    npm run build
+    ```
+    
+    This command runs `next build --webpack` which:
+    - Compiles TypeScript to JavaScript
+    - Optimizes React components
+    - Bundles assets with webpack
+    - Generates optimized static pages
+    - Creates the `.next` directory with production artifacts
+  </Step>
+
+  <Step title="Verify Build Output">
+    After a successful build, you should see output indicating:
+    - Routes compiled
+    - Page sizes
+    - Build optimization details
+    
+    The `.next` directory will contain all compiled assets needed for production.
+  </Step>
+</Steps>
+
+## Production Optimization
+
+### Webpack Configuration
+
+The project explicitly uses webpack as the bundler (via the `--webpack` flag). This is specified in both development and production scripts.
+
+### Next.js Configuration
+
+The Next.js configuration is minimal (`next.config.ts:1-8`) with default settings, which provides:
+
+- Automatic code splitting
+- Image optimization
+- Font optimization
+- Server-side rendering (SSR)
+- API routes optimization
+
+### Build Output
+
+The production build generates:
+
+- **Static pages**: Pre-rendered HTML for static routes
+- **API routes**: Compiled serverless functions for `/api/contact` and `/api/complaint`
+- **Client bundles**: Optimized JavaScript for browser execution
+- **Server bundles**: Node.js code for server-side rendering
+
+## Key Dependencies
+
+The production build includes several key libraries:
+
+- **Next.js 16.0.10**: React framework
+- **React 19.2.0**: UI library
+- **Nodemailer 7.0.10**: Email functionality for API routes
+- **Framer Motion 12.23.24**: Animation library
+- **GSAP 3.13.0**: Animation library
+- **Tailwind CSS 4**: Styling framework
+
+## Build Artifacts
+
+<Warning>
+  Never commit the `.next` directory to version control. It should be generated fresh on each deployment.
+</Warning>
+
+The build process creates:
+
+```
+.next/
+├── cache/           # Build cache
+├── server/          # Server-side code
+├── static/          # Static assets
+└── BUILD_ID         # Unique build identifier
+```
+
+## Starting Production Server
+
+After building, start the production server:
+
+```bash
+npm start
+```
+
+This runs `next start` which serves the optimized production build on port 3000 by default.
+
+## Troubleshooting
+
+### Build Fails with TypeScript Errors
+
+Ensure all TypeScript dependencies are installed:
+
+```bash
+npm install --save-dev typescript @types/node @types/react @types/react-dom
+```
+
+### Out of Memory Errors
+
+Increase Node.js memory limit:
+
+```bash
+NODE_OPTIONS="--max-old-space-size=4096" npm run build
+```
+
+### Webpack Configuration Issues
+
+If you encounter webpack-specific errors, verify that the `--webpack` flag is present in the build script. This project requires webpack as the bundler.

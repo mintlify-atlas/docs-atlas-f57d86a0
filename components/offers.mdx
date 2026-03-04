@@ -1,0 +1,371 @@
+---
+title: 'Offers Carousel'
+description: 'Special promotions carousel with WhatsApp integration and gift animations'
+---
+
+# Offers Carousel
+
+The Offers Carousel displays special promotional packages with integrated WhatsApp call-to-action buttons and animated gift badges.
+
+## Location
+
+- **Component**: `components/offersCarousel.tsx`
+- **Data**: `components/offers.tsx`
+
+## Features
+
+- Responsive carousel (horizontal cards on desktop, swipeable on mobile)
+- WhatsApp direct messaging integration
+- Animated spinning text for gift promotions
+- Checkmark list for offer details
+- Dot indicators for mobile navigation
+- Embla Carousel for smooth scrolling
+
+## Component Structure
+
+```tsx
+import { useCallback, useEffect, useState } from "react";
+import { offers } from "./offers";
+import { CheckCircle } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import clsx from "clsx";
+import { Badge } from "./ui/badge";
+
+function OffersCarousel() {
+  const phone = "51903565918";
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // WhatsApp URL generator
+  const getWhatsAppUrl = (message: string) =>
+    `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+
+  // ... carousel controls
+
+  return (
+    <>
+      {/* Desktop Layout */}
+      {/* Mobile Carousel */}
+    </>
+  );
+}
+```
+
+## Offers Data Structure
+
+Location: `components/offers.tsx`
+
+```tsx
+import { SpinningText } from "./ui/spinning-text";
+
+export const offers = [
+  {
+    id: 1,
+    title: "Combo Verano",
+    subtitle: "Siempre cuidamos tu salud",
+    price: "S/ 15",
+    highlight: "Ahorra 12%",
+    details: [
+      "1 Reposición de bidon de 20 Litros",
+      "1 Botella de 7 Litros",
+      "Envio gratuito Huacho, Carquin y Hualmay",
+    ],
+    image: <img src="/img/gift.png" alt="Gift" className="w-10 lg:w-12" />,
+    gift: <SpinningText className="text-sm md:text-base font-normal md:font-medium" radius={5}>
+      Haz tu pedido y recibe tu regalo •
+    </SpinningText>,
+    note: "Promoción válida hasta agotar stock",
+    whatsappMessage: "Hola, estoy interesado en el Combo Verano (S/15). ¿Podrías brindarme más información?",
+  },
+  // ... more offers
+];
+```
+
+<ParamField path="offers[]" type="array">
+  Array of offer objects
+</ParamField>
+
+<ParamField path="offers[].id" type="number">
+  Unique offer identifier
+</ParamField>
+
+<ParamField path="offers[].title" type="string">
+  Offer package name
+</ParamField>
+
+<ParamField path="offers[].subtitle" type="string">
+  Offer tagline or description
+</ParamField>
+
+<ParamField path="offers[].price" type="string">
+  Formatted price string (e.g., "S/ 15")
+</ParamField>
+
+<ParamField path="offers[].highlight" type="string">
+  Savings or promotional highlight
+</ParamField>
+
+<ParamField path="offers[].details" type="string[]">
+  Array of offer details/features
+</ParamField>
+
+<ParamField path="offers[].image" type="JSX.Element">
+  Gift icon image component
+</ParamField>
+
+<ParamField path="offers[].gift" type="JSX.Element">
+  SpinningText component for animated badge
+</ParamField>
+
+<ParamField path="offers[].note" type="string">
+  Terms and conditions text
+</ParamField>
+
+<ParamField path="offers[].whatsappMessage" type="string">
+  Pre-filled WhatsApp message template
+</ParamField>
+
+## Desktop Layout
+
+```tsx
+<div className="hidden md:flex justify-center items-center gap-6 lg:gap-12 p-4 mt-8">
+  {offers.map((offer) => (
+    <div
+      key={offer.id}
+      className="h-full bg-white p-4 lg:p-6 flex flex-col justify-between rounded-[40px] shadow-[8px_8px_16px_#c5c5c5,-8px_-8px_16px_#ffffff]"
+    >
+      <div className="h-30 lg:h-20 flex flex-col gap-1">
+        <h2 className="text-base md:text-lg 2xl:text-xl font-bold text-center">
+          {offer.title}
+        </h2>
+        <h3 className="text-center text-base">{offer.subtitle}</h3>
+      </div>
+
+      <div className="h-70 lg:h-60 justify-between">
+        <p className="text-2xl 2xl:text-3xl text-center font-bold text-blue-600 mb-2">
+          {offer.price}
+        </p>
+        <p className="text-sm text-green-600 text-center font-medium mb-4">
+          {offer.highlight}
+        </p>
+
+        <ul className="space-y-1 2xl:space-y-2 text-sm">
+          {offer.details.map((detail, i) => (
+            <li key={i} className="flex items-start sm:items-center">
+              <span className="mr-2">
+                <CheckCircle className="w-4 h-4 text-blue-600" />
+              </span>
+              {detail}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="w-full h-30 flex justify-center items-center">
+        <div>
+          {offer.gift}
+          <span className="relative bottom-6 lg:bottom-7">
+            {offer.image}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-center text-gray-500">{offer.note}</p>
+        <a
+          href={getWhatsAppUrl(offer.whatsappMessage)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="w-full py-2 2xl:py-3 rounded-full bg-[#1F01B9] text-base 2xl:text-lg font-semibold text-white transition-colors hover:bg-[#391FB6]">
+            Solicitar ahora
+          </button>
+        </a>
+      </div>
+    </div>
+  ))}
+</div>
+```
+
+## Mobile Carousel Layout
+
+```tsx
+<div className="block md:hidden relative">
+  <div className="overflow-hidden py-8" ref={emblaRef}>
+    <div className="flex">
+      {offers.map((offer) => (
+        <div key={offer.id} className="flex-[0_0_80%] min-w-0 pl-5 pr-5">
+          <div className="h-full bg-white flex flex-col justify-between rounded-[40px] p-4 shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff] w-full will-change-transform">
+            {/* Offer content */}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Dot indicators */}
+  <div className="flex justify-center gap-2 -mt-2">
+    {offers.map((_, i) => (
+      <button
+        key={i}
+        onClick={() => scrollTo(i)}
+        className={clsx(
+          "w-2 h-2 rounded-full transition-all",
+          i === selectedIndex ? "bg-[#1F01B9] w-4" : "bg-gray-300"
+        )}
+        aria-label={`Ir a oferta ${i + 1}`}
+      />
+    ))}
+  </div>
+</div>
+```
+
+### Carousel Configuration
+
+```tsx
+const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+```
+
+<ParamField path="loop" type="boolean" default={false}>
+  Disable infinite looping for offers
+</ParamField>
+
+<ParamField path="flex-[0_0_80%]" type="CSS">
+  Each slide takes 80% of viewport width on mobile
+</ParamField>
+
+## WhatsApp Integration
+
+### URL Generator
+
+```tsx
+const phone = "51903565918";
+
+const getWhatsAppUrl = (message: string) =>
+  `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+```
+
+### CTA Button
+
+```tsx
+<a
+  href={getWhatsAppUrl(offer.whatsappMessage)}
+  target="_blank"
+  rel="noopener noreferrer"
+  title={`Chatea sobre ${offer.title} por WhatsApp`}
+  aria-label={`Abrir chat de WhatsApp para ${offer.title}`}
+  className="w-full"
+>
+  <button className="w-full py-2 rounded-full bg-[#1F01B9] text-base font-semibold text-white transition-colors hover:bg-[#391FB6]">
+    Solicitar ahora
+  </button>
+</a>
+```
+
+### Pre-filled Messages
+
+```tsx
+whatsappMessage: "Hola, estoy interesado en el Combo Verano (S/15). ¿Podrías brindarme más información?"
+```
+
+Messages are automatically URL-encoded and pre-filled in WhatsApp.
+
+## Spinning Text Animation
+
+The gift badge uses the `SpinningText` component:
+
+```tsx
+import { SpinningText } from "./ui/spinning-text";
+
+<SpinningText 
+  className="text-sm md:text-base font-normal md:font-medium" 
+  radius={5}
+>
+  Haz tu pedido y recibe tu regalo •
+</SpinningText>
+```
+
+<ParamField path="radius" type="number" default={5}>
+  Radius of the circular text path
+</ParamField>
+
+<ParamField path="duration" type="number" default={10}>
+  Animation duration in seconds
+</ParamField>
+
+See [Spinning Text documentation](/components/ui-components#spinning-text) for details.
+
+## Usage Example
+
+In `app/page.tsx`:
+
+```tsx
+import OffersCarousel from "@/components/offersCarousel";
+
+<section id="ofertas" className="w-full mx-auto pt-20 pb-10">
+  <div className="flex flex-col items-center justify-center text-center px-6">
+    <h2 className="text-2xl md:text-4xl font-bold text-[#1F01B9] mb-3">
+      Ofertas Especiales
+    </h2>
+    <p className="text-sm md:text-base text-gray-700">
+      Aprovecha nuestras promociones y ahorra en tus compras
+    </p>
+  </div>
+  <OffersCarousel />
+</section>
+```
+
+## Dependencies
+
+- `embla-carousel-react` - Carousel functionality
+- `lucide-react` - CheckCircle icon
+- `clsx` - Conditional classes for indicators
+- `@/components/ui/badge` - Badge component
+- `@/components/ui/spinning-text` - Animated text
+
+## Styling
+
+### Card Layout
+
+```css
+flex flex-col justify-between
+```
+
+Ensures consistent card heights with content distributed evenly.
+
+### Highlight Badge (Mobile)
+
+```tsx
+<Badge className="bg-green-600 text-white">{offer.highlight}</Badge>
+```
+
+Green badge emphasizes savings on mobile.
+
+### Details List
+
+```tsx
+<ul className="space-y-1 text-sm">
+  {offer.details.map((detail, i) => (
+    <li key={i} className="flex items-start">
+      <CheckCircle className="w-4 h-4 text-blue-600" />
+      {detail}
+    </li>
+  ))}
+</ul>
+```
+
+Checkmarks provide visual confirmation of included features.
+
+## Accessibility
+
+- WhatsApp links include descriptive `aria-label` and `title` attributes
+- Dot indicators have `aria-label` for screen readers
+- `rel="noopener noreferrer"` for external link security
+- Semantic HTML structure with proper heading hierarchy
+
+## Performance
+
+- `will-change-transform` optimizes carousel animations
+- Pre-encoded WhatsApp URLs for faster navigation
+- Optimized images for gift icons
+- Touch-friendly tap targets (minimum 44x44px)

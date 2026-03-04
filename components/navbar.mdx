@@ -1,0 +1,238 @@
+---
+title: 'Navbar Component'
+description: 'Fixed navigation header with animated logo and mobile menu'
+---
+
+# Navbar Component
+
+The Navbar is a fixed header component featuring an animated expandable logo and an integrated mobile-friendly staggered menu system.
+
+## Location
+
+`components/navbar.tsx`
+
+## Features
+
+- Fixed positioning at the top of the viewport
+- Animated logo that expands on hover (desktop only)
+- Smooth scroll navigation to page sections
+- Responsive design with mobile-specific styling
+- Integration with CustomStaggeredMenu component
+- Custom font integration (Pacifico)
+
+## Component Structure
+
+```tsx
+import CustomStaggeredMenu from "@/components/customStaggeredMenu";
+import { pacifico } from "@/lib/fonts";
+import clsx from "clsx";
+import { motion } from "framer-motion";
+import { useState } from "react";
+
+function Navbar() {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <header className="fixed w-full top-3 lg:top-5 left-0 z-40 px-6 flex justify-between items-center">
+      {/* Animated Logo */}
+      {/* CustomStaggeredMenu */}
+    </header>
+  );
+}
+```
+
+## Menu Configuration
+
+### Menu Items
+
+The navbar uses predefined menu items with section anchors:
+
+```tsx
+const menuItems = [
+  {
+    label: "INICIO",
+    number: "01",
+    ariaLabel: "Ir a la página de inicio",
+    link: "inicio",
+  },
+  {
+    label: "NOSOTROS",
+    number: "02",
+    ariaLabel: "Conoce más sobre nosotros",
+    link: "nosotros",
+  },
+  {
+    label: "PRESENTACIONES",
+    number: "03",
+    ariaLabel: "Ver nuestras presentaciones de productos",
+    link: "productos",
+  },
+  {
+    label: "PROCESO",
+    number: "04",
+    ariaLabel: "Descubre nuestro proceso de purificación del agua",
+    link: "proceso",
+  },
+  {
+    label: "OFERTAS",
+    number: "05",
+    ariaLabel: "Explorar nuestras ofertas y promociones",
+    link: "ofertas",
+  },
+  {
+    label: "EVENTOS",
+    number: "06",
+    ariaLabel: "Conoce nuestros patrocinios y colaboraciones",
+    link: "eventos",
+  },
+  {
+    label: "CONTÁCTANOS",
+    number: "07",
+    ariaLabel: "Ir a la sección de contacto",
+    link: "contactanos",
+  },
+];
+```
+
+### Social Items
+
+```tsx
+const socialItems = [
+  { label: "Facebook", link: "https://www.facebook.com/" },
+  { label: "Instagram", link: "https://www.instagram.com/" },
+];
+```
+
+## Animated Logo
+
+### Desktop Version
+
+The desktop logo uses Framer Motion for smooth width transitions:
+
+```tsx
+<motion.button
+  onMouseEnter={() => setIsHovered(true)}
+  onMouseLeave={() => setIsHovered(false)}
+  onClick={() => {
+    const inicio = document.getElementById("inicio");
+    if (inicio) {
+      inicio.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  animate={{ width: isHovered ? "11rem" : "3.5rem" }}
+  transition={{ type: "spring", stiffness: 120, damping: 15 }}
+  className="hidden cursor-pointer overflow-hidden bg-[#1F01B9] border-2 border-gray-200 rounded-full h-14 xl:flex items-center justify-start shadow-md"
+>
+  <div className="flex items-center pl-3 pb-5">
+    <p className={clsx("text-6xl font-bold text-white select-none", pacifico.className)}>
+      e
+    </p>
+    <motion.span
+      animate={{
+        opacity: isHovered ? 1 : 0,
+        x: isHovered ? 0 : -10,
+      }}
+      transition={{ delay: isHovered ? 0.2 : 0, duration: 0.4 }}
+      className="text-3xl mt-5 ml-1 text-white font-semibold select-none"
+    >
+      ufrosine
+    </motion.span>
+  </div>
+</motion.button>
+```
+
+<ParamField path="width" type="string">
+  Animates between `3.5rem` (collapsed) and `11rem` (expanded)
+</ParamField>
+
+<ParamField path="transition" type="object">
+  Spring animation with `stiffness: 120` and `damping: 15`
+</ParamField>
+
+### Mobile Version
+
+The mobile logo is a static circular button:
+
+```tsx
+<button
+  onClick={() => {
+    const inicio = document.getElementById("inicio");
+    if (inicio) {
+      inicio.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  className="xl:hidden cursor-pointer overflow-hidden bg-[#1F01B9] border border-gray-200 rounded-full h-11.5 w-11.5 flex items-center justify-start shadow-md"
+>
+  <div className="flex items-center mx-auto">
+    <p className={clsx("text-5xl font-bold text-white mb-4", pacifico.className)}>
+      e
+    </p>
+  </div>
+</button>
+```
+
+## CustomStaggeredMenu Integration
+
+The navbar passes menu configuration to the CustomStaggeredMenu component:
+
+```tsx
+<CustomStaggeredMenu items={menuItems} socialItems={socialItems} />
+```
+
+See the [CustomStaggeredMenu documentation](#customstaggeredmenu) for details on the slide-in menu implementation.
+
+## Styling
+
+### Color Scheme
+
+- **Primary Background**: `#1F01B9` (Deep blue)
+- **Border**: `border-gray-200`
+- **Text**: White
+
+### Positioning
+
+- **Desktop**: `top-5` (1.25rem from top)
+- **Mobile**: `top-3` (0.75rem from top)
+- **Z-index**: `z-40` (stays above content but below modals)
+
+### Responsive Classes
+
+```css
+fixed w-full top-3 lg:top-5 left-0 z-40 px-6
+```
+
+## Accessibility
+
+- All menu items include `ariaLabel` attributes
+- Logo button includes click handler for keyboard navigation
+- Smooth scroll behavior for better user experience
+- Select-none prevents text selection on logo
+
+## Usage Example
+
+```tsx
+import Navbar from '@/components/navbar';
+
+export default function Layout({ children }) {
+  return (
+    <>
+      <Navbar />
+      <main>{children}</main>
+    </>
+  );
+}
+```
+
+## Dependencies
+
+- `framer-motion` - Animation library
+- `clsx` - Conditional class names
+- `@/lib/fonts` - Custom font imports (Pacifico)
+- `@/components/customStaggeredMenu` - Menu component
+
+## Performance Considerations
+
+- Logo animation uses GPU-accelerated transforms
+- Spring physics create natural motion feel
+- Overflow hidden prevents layout shifts
+- Fixed positioning removes from document flow

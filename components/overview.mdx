@@ -1,0 +1,113 @@
+---
+title: 'Components Overview'
+description: 'Comprehensive guide to all components in the Eufrosine project'
+---
+
+# Components Overview
+
+The Eufrosine project is built with a modular component architecture using Next.js 14+ and React. This section provides documentation for all components used throughout the application.
+
+## Component Categories
+
+### Navigation Components
+
+- **[Navbar](/components/navbar)** - Fixed header with animated logo and mobile menu
+- **CustomStaggeredMenu** - Animated slide-in navigation menu with staggered animations
+
+### Hero Section
+
+- **[Hero with Video Background](/components/hero)** - Full-screen hero section with optimized video background
+- **OptimizedVideo** - Performance-optimized video component with lazy loading
+
+### Product Display
+
+- **[Products Carousel](/components/products)** - Responsive carousel showcasing water bottle presentations
+- **Products Data** - Product information data structure
+
+### Offers & Promotions
+
+- **[Offers Carousel](/components/offers)** - Special promotions carousel with WhatsApp integration
+- **Offers Data** - Promotional offer configurations
+
+### Events Section
+
+- **[Events Layout](/components/events)** - Event showcase with image galleries and badges
+
+### UI Components
+
+- **[Badge](/components/ui-components#badge)** - Flexible badge component with variants
+- **[Card](/components/ui-components#card)** - Reusable card component with subcomponents
+- **[Label](/components/ui-components#label)** - Accessible form label component
+- **[Spinning Text](/components/ui-components#spinning-text)** - Animated circular text component
+- **[Glowing Effect](/components/ui-components#glowing-effect)** - Interactive glowing border effect
+
+## Technology Stack
+
+All components are built using:
+
+- **React 18+** - Component framework
+- **Next.js 14+** - App Router with Server/Client Components
+- **TypeScript** - Type safety
+- **Framer Motion** - Animations and transitions
+- **Tailwind CSS** - Styling
+- **Radix UI** - Accessible primitives
+- **Embla Carousel** - Touch-friendly carousels
+- **clsx/cn** - Class name utilities
+
+## Design Patterns
+
+### Client Components
+
+Most components are client-side rendered (marked with `"use client"`) to enable:
+
+- Interactive animations with Framer Motion
+- State management with React hooks
+- Event handling and user interactions
+- Carousel functionality
+
+### Responsive Design
+
+All components follow a mobile-first approach with responsive breakpoints:
+
+```jsx
+<div className="sm:max-w-xl lg:max-w-5xl 2xl:max-w-7xl">
+  {/* Mobile: base styles */}
+  {/* Tablet: sm: and md: prefixes */}
+  {/* Desktop: lg: and xl: prefixes */}
+  {/* Large screens: 2xl: prefix */}
+</div>
+```
+
+### Accessibility
+
+Components include accessibility features:
+
+- ARIA labels for interactive elements
+- Semantic HTML elements
+- Keyboard navigation support
+- Screen reader compatibility
+
+## Getting Started
+
+Explore the individual component documentation pages to learn about:
+
+- Component props and configuration
+- Usage examples with code snippets
+- Integration patterns
+- Customization options
+
+<Card>
+  <CardHeader>
+    <CardTitle>Next Steps</CardTitle>
+    <CardDescription>
+      Choose a component category to explore detailed documentation
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    - [Navbar Component](/components/navbar)
+    - [Hero Section](/components/hero)
+    - [Products Carousel](/components/products)
+    - [Offers System](/components/offers)
+    - [UI Components](/components/ui-components)
+  </CardContent>
+</Card>

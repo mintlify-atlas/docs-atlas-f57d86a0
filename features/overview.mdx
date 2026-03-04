@@ -1,0 +1,148 @@
+---
+title: Features Overview
+description: Comprehensive overview of Eufrosine's key features and technologies
+---
+
+# Features Overview
+
+Eufrosine is built with modern web technologies to deliver a smooth, engaging, and performant user experience. This section provides a comprehensive overview of the key features implemented in the project.
+
+## Key Features
+
+### 1. Smooth Scroll Experience
+
+The website implements **Lenis Smooth Scroll** to provide a buttery-smooth scrolling experience across all devices.
+
+<Note>
+  Lenis creates natural, physics-based scrolling with customizable easing and momentum.
+</Note>
+
+**Key Benefits:**
+- Enhanced user experience with smooth, natural scrolling
+- Configurable duration, lerp, and easing functions
+- Support for both wheel and touch interactions
+- Lightweight and performant
+
+[Learn more about Smooth Scroll →](/features/smooth-scroll)
+
+---
+
+### 2. Advanced Animations
+
+Eufrosine uses **Framer Motion** for declarative animations and UI transitions throughout the application.
+
+**Animation Highlights:**
+- Navbar logo expansion on hover
+- Staggered menu animations with cascading panels
+- Smooth page transitions
+- Interactive UI component animations
+
+<Card title="Animation Libraries Used" icon="sparkles">
+  - **Framer Motion** v12.23.24 - Primary animation library
+  - **GSAP** v3.13.0 - Available for advanced timeline animations
+</Card>
+
+[Learn more about Animations →](/features/animations)
+
+---
+
+### 3. Interactive Carousels
+
+The project features **Embla Carousel** implementations for both product presentations and special offers.
+
+**Carousel Features:**
+- Touch-enabled mobile carousels
+- Dot navigation indicators
+- Responsive grid layouts for desktop
+- Smooth transitions with custom styling
+- Optimized for performance
+
+**Implementations:**
+- **Products Carousel** - Showcases water bottle presentations
+- **Offers Carousel** - Displays promotional deals and packages
+
+[Learn more about Carousels →](/features/carousels)
+
+---
+
+### 4. Contact Form with Email Integration
+
+A fully functional contact form with **Nodemailer** integration for email delivery.
+
+**Form Capabilities:**
+- Client-side form validation
+- Loading states during submission
+- SweetAlert2 success/error notifications
+- Email delivery via Gmail SMTP
+- Reply-to functionality for easy responses
+
+<Warning>
+  Make sure to configure `EMAIL_USER` and `EMAIL_PASSWORD` environment variables for the contact form to work.
+</Warning>
+
+[Learn more about Contact Form →](/features/contact-form)
+
+---
+
+## Technology Stack Summary
+
+<CodeGroup>
+```json package.json
+{
+  "dependencies": {
+    "@studio-freight/lenis": "^1.0.42",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.23.24",
+    "gsap": "^3.13.0",
+    "nodemailer": "^7.0.10",
+    "sweetalert2": "^11.26.3"
+  }
+}
+```
+</CodeGroup>
+
+## Additional Features
+
+### UI Components
+- **Badge** - Custom badge components for tags and labels
+- **Card** - Flexible card components with shadow effects
+- **Label** - Form label components
+- **Glowing Effect** - Special effect components for visual appeal
+- **Spinning Text** - Animated text components
+
+### Optimizations
+- **Optimized Video** - Custom video component for hero sections
+- **Body Scroll Lock** - Custom hook to prevent body scrolling when modals are open
+- **Price Formatting** - Utility functions for consistent price display
+
+### Modal Dialogs
+- Privacy Policy modal
+- Terms and Conditions modal
+- Complaint Book (Libro de Reclamaciones) modal
+
+All modals feature:
+- Backdrop blur effects
+- Scroll locking
+- Click-outside to close
+- Smooth transitions
+
+---
+
+## Next Steps
+
+Explore each feature in detail:
+
+<CardGroup cols={2}>
+  <Card title="Animations" icon="wand-magic-sparkles" href="/features/animations">
+    Learn about Framer Motion and GSAP implementation
+  </Card>
+  <Card title="Contact Form" icon="envelope" href="/features/contact-form">
+    Set up and configure the contact form with Nodemailer
+  </Card>
+  <Card title="Smooth Scroll" icon="arrows-up-down" href="/features/smooth-scroll">
+    Configure Lenis smooth scrolling behavior
+  </Card>
+  <Card title="Carousels" icon="images" href="/features/carousels">
+    Implement Embla carousels for content display
+  </Card>
+</CardGroup>

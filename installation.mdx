@@ -1,0 +1,916 @@
+---
+title: Detailed Installation Guide
+description: Complete installation guide for Eufrosine including system requirements, dependencies, environment setup, and deployment
+---
+
+# Detailed Installation Guide
+
+This comprehensive guide covers everything you need to install, configure, and deploy the Eufrosine website. Follow these steps for a production-ready setup.
+
+## System Requirements
+
+<Note>
+  Ensure your system meets these requirements before starting the installation.
+</Note>
+
+### Required Software
+
+<Steps>
+  <Step title="Node.js (Version 20 or higher)">
+    Eufrosine requires Node.js 20+ for optimal performance and compatibility with React 19.
+
+    **Check your current version:**
+    ```bash
+    node --version
+    # Should output v20.x.x or higher
+    ```
+
+    **Install or update Node.js:**
+    
+    <CodeGroup>
+    
+    ```bash macOS (Homebrew)
+    # Install Node.js via Homebrew
+    brew install node@20
+
+    # Or update existing installation
+    brew upgrade node
+    ```
+
+    ```bash Linux (Ubuntu/Debian)
+    # Using NodeSource repository
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+    # Verify installation
+    node --version
+    npm --version
+    ```
+
+    ```bash Windows
+    # Download from official website
+    # Visit: https://nodejs.org/en/download/
+
+    # Or use Chocolatey
+    choco install nodejs-lts
+
+    # Or use Windows Package Manager
+    winget install OpenJS.NodeJS.LTS
+    ```
+
+    ```bash Using nvm (Recommended)
+    # Install nvm first, then:
+    nvm install 20
+    nvm use 20
+    nvm alias default 20
+    ```
+
+    </CodeGroup>
+
+    <Warning>
+      **Node.js 18 and below are NOT supported** due to React 19 requirements and Next.js 16 dependencies.
+    </Warning>
+  </Step>
+
+  <Step title="Package Manager">
+    Eufrosine supports multiple package managers. Choose one:
+
+    <Tabs>
+      <Tab title="npm (Recommended)">
+        Comes bundled with Node.js. Verify installation:
+
+        ```bash
+        npm --version
+        # Should output 10.x.x or higher
+        ```
+
+        Update npm to latest:
+        ```bash
+        npm install -g npm@latest
+        ```
+      </Tab>
+
+      <Tab title="pnpm">
+        Fast, disk space efficient package manager:
+
+        ```bash
+        npm install -g pnpm
+        pnpm --version
+        ```
+
+        Use with:
+        ```bash
+        pnpm install
+        pnpm dev
+        ```
+      </Tab>
+
+      <Tab title="yarn">
+        Alternative package manager:
+
+        ```bash
+        npm install -g yarn
+        yarn --version
+        ```
+
+        Use with:
+        ```bash
+        yarn install
+        yarn dev
+        ```
+      </Tab>
+
+      <Tab title="bun">
+        Ultra-fast JavaScript runtime:
+
+        ```bash
+        curl -fsSL https://bun.sh/install | bash
+        bun --version
+        ```
+
+        Use with:
+        ```bash
+        bun install
+        bun dev
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Git">
+    Required for cloning the repository and version control.
+
+    **Check installation:**
+    ```bash
+    git --version
+    ```
+
+    **Install if needed:**
+    <CodeGroup>
+
+    ```bash macOS
+    # Via Homebrew
+    brew install git
+
+    # Or download from: https://git-scm.com/download/mac
+    ```
+
+    ```bash Linux
+    # Ubuntu/Debian
+    sudo apt-get install git
+
+    # Fedora
+    sudo dnf install git
+
+    # Arch
+    sudo pacman -S git
+    ```
+
+    ```bash Windows
+    # Download from: https://git-scm.com/download/win
+
+    # Or use Chocolatey
+    choco install git
+
+    # Or Windows Package Manager
+    winget install Git.Git
+    ```
+
+    </CodeGroup>
+  </Step>
+</Steps>
+
+### Optional but Recommended
+
+- **Code Editor**: VS Code with extensions:
+  - ES7+ React/Redux/React-Native snippets
+  - Tailwind CSS IntelliSense
+  - ESLint
+  - Prettier - Code formatter
+  - TypeScript and JavaScript Language Features
+
+- **Browser DevTools**: Chrome/Firefox/Edge with React DevTools extension
+
+## Installation Steps
+
+<Steps>
+  <Step title="Clone the Repository">
+    Get the source code from GitHub:
+
+    ```bash
+    # Clone via HTTPS
+    git clone https://github.com/yourusername/proyecto-eufrosine.git
+
+    # Or clone via SSH (if you have SSH keys set up)
+    git clone git@github.com:yourusername/proyecto-eufrosine.git
+
+    # Navigate into the project
+    cd proyecto-eufrosine
+    ```
+
+    <Tip>
+      Replace `yourusername` with the actual repository owner's username or organization name.
+    </Tip>
+  </Step>
+
+  <Step title="Install Dependencies">
+    Install all required npm packages:
+
+    ```bash
+    npm install
+    ```
+
+    This installs:
+
+    **Core Dependencies** (from `package.json`):
+    ```json
+    {
+      "next": "16.0.10",
+      "react": "19.2.0",
+      "react-dom": "19.2.0",
+      "typescript": "^5"
+    }
+    ```
+
+    **UI & Styling:**
+    ```json
+    {
+      "@radix-ui/react-label": "^2.1.7",
+      "@radix-ui/react-slot": "^1.2.3",
+      "tailwindcss": "^4",
+      "@tailwindcss/postcss": "^4",
+      "class-variance-authority": "^0.7.1",
+      "clsx": "^2.1.1",
+      "tailwind-merge": "^3.3.1",
+      "lucide-react": "^0.548.0",
+      "react-icons": "^5.5.0"
+    }
+    ```
+
+    **Animations:**
+    ```json
+    {
+      "framer-motion": "^12.23.24",
+      "motion": "^12.23.24",
+      "gsap": "^3.13.0",
+      "@studio-freight/lenis": "^1.0.42",
+      "lenis": "^1.3.13"
+    }
+    ```
+
+    **Components:**
+    ```json
+    {
+      "embla-carousel-react": "^8.6.0",
+      "sweetalert2": "^11.26.3"
+    }
+    ```
+
+    **Backend:**
+    ```json
+    {
+      "nodemailer": "^7.0.10",
+      "@types/nodemailer": "^7.0.3"
+    }
+    ```
+
+    <Warning>
+      **Installation time**: First install may take 2-5 minutes depending on your internet connection. The `node_modules` folder will be approximately 400-500MB.
+    </Warning>
+  </Step>
+
+  <Step title="Environment Configuration">
+    Create environment files for different deployment stages:
+
+    ### Development Environment
+
+    Create `.env.local` in the project root:
+
+    ```bash
+    touch .env.local
+    ```
+
+    Add the following configuration:
+
+    ```bash .env.local
+    # ============================================
+    # EUFROSINE ENVIRONMENT VARIABLES
+    # ============================================
+
+    # Email Configuration (Nodemailer)
+    # -----------------------------------------
+    # Gmail Configuration
+    EMAIL_USER=your-email@gmail.com
+    EMAIL_PASS=your-gmail-app-password
+    EMAIL_TO=aguademesaeufrosineperu@gmail.com
+
+    # For other SMTP providers, add these:
+    # SMTP_HOST=smtp.yourdomain.com
+    # SMTP_PORT=587
+    # SMTP_SECURE=false
+
+    # Company Information
+    # -----------------------------------------
+    NEXT_PUBLIC_COMPANY_NAME="Eufrosine - Agua de Mesa"
+    NEXT_PUBLIC_COMPANY_PHONE="+51903565918"
+    NEXT_PUBLIC_COMPANY_EMAIL="aguademesaeufrosineperu@gmail.com"
+    NEXT_PUBLIC_SITE_URL="https://eufrosine.vercel.app"
+
+    # Social Media Links
+    # -----------------------------------------
+    NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/aguaeufrosine"
+    NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/aguaeufrosine/"
+    NEXT_PUBLIC_WHATSAPP_URL="https://wa.me/51903565918"
+
+    # Optional: Analytics
+    # -----------------------------------------
+    # NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+    # NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
+    ```
+
+    <Accordion title="Getting Gmail App Password">
+      For Gmail accounts with 2-Factor Authentication:
+
+      1. Go to [Google Account Security](https://myaccount.google.com/security)
+      2. Enable 2-Step Verification if not already enabled
+      3. Go to [App Passwords](https://myaccount.google.com/apppasswords)
+      4. Select "Mail" and "Other (Custom name)"
+      5. Enter "Eufrosine Website"
+      6. Copy the generated 16-character password
+      7. Use this as `EMAIL_PASS` in `.env.local`
+
+      <Warning>
+        **Never commit `.env.local` to version control!** It's already in `.gitignore`.
+      </Warning>
+    </Accordion>
+
+    <Accordion title="Using Custom SMTP Server">
+      If you're not using Gmail, modify `/app/api/contact/route.ts`:
+
+      ```typescript
+      import nodemailer from "nodemailer";
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || "smtp.gmail.com",
+        port: parseInt(process.env.SMTP_PORT || "587"),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+      ```
+    </Accordion>
+
+    ### Production Environment
+
+    For production deployment (Vercel, Netlify, etc.), set environment variables in your hosting platform's dashboard.
+
+    <Tip>
+      **Security**: Never expose sensitive credentials in client-side code. Only variables prefixed with `NEXT_PUBLIC_` are accessible in the browser.
+    </Tip>
+  </Step>
+
+  <Step title="Verify Installation">
+    Test that everything is set up correctly:
+
+    ```bash
+    # Start development server
+    npm run dev
+    ```
+
+    You should see:
+    ```bash
+    ▲ Next.js 16.0.10
+    - Local:        http://localhost:3000
+    - Environments: .env.local
+
+    ✓ Ready in 2.5s
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+    <Check>
+      **Success indicators:**
+      - Homepage loads with hero video
+      - Smooth scrolling works
+      - Navigation menu functions
+      - Carousels are interactive
+      - No console errors in browser DevTools
+    </Check>
+
+    <Warning>
+      **Common issues:**
+      - Port 3000 already in use → Try `npm run dev -- -p 3001`
+      - Module errors → Delete `node_modules` and run `npm install` again
+      - Video not loading → Check `/public` directory contains video files
+    </Warning>
+  </Step>
+
+  <Step title="TypeScript Configuration">
+    Eufrosine uses TypeScript 5 for type safety. The configuration is already set up in `tsconfig.json`:
+
+    ```json tsconfig.json
+    {
+      "compilerOptions": {
+        "target": "ES2017",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "incremental": true,
+        "paths": {
+          "@/*": ["./*"]
+        }
+      }
+    }
+    ```
+
+    <Note>
+      The `@/*` path alias allows you to import from project root:
+      ```typescript
+      import { cn } from "@/lib/utils";
+      import Navbar from "@/components/navbar";
+      ```
+    </Note>
+  </Step>
+
+  <Step title="Next.js Configuration">
+    The Next.js configuration is minimal by default (`next.config.ts`):
+
+    ```typescript next.config.ts
+    import type { NextConfig } from "next";
+
+    const nextConfig: NextConfig = {
+      /* config options here */
+    };
+
+    export default nextConfig;
+    ```
+
+    **Optional enhancements** you can add:
+
+    ```typescript next.config.ts (Enhanced)
+    import type { NextConfig } from "next";
+
+    const nextConfig: NextConfig = {
+      // Image optimization
+      images: {
+        formats: ["image/avif", "image/webp"],
+        remotePatterns: [
+          {
+            protocol: "https",
+            hostname: "**",
+          },
+        ],
+      },
+
+      // Webpack configuration (if needed)
+      webpack: (config) => {
+        config.resolve.alias.canvas = false;
+        return config;
+      },
+
+      // Experimental features
+      experimental: {
+        optimizePackageImports: ["lucide-react", "@radix-ui/react-label"],
+      },
+    };
+
+    export default nextConfig;
+    ```
+  </Step>
+</Steps>
+
+## Project Scripts
+
+Available npm scripts from `package.json`:
+
+<CodeGroup>
+
+```json Development
+{
+  "scripts": {
+    "dev": "next dev --webpack"
+  }
+}
+
+// Usage:
+npm run dev
+// Starts dev server on http://localhost:3000
+// Hot module replacement enabled
+// TypeScript type checking
+```
+
+```json Build
+{
+  "scripts": {
+    "build": "next build --webpack"
+  }
+}
+
+// Usage:
+npm run build
+// Creates optimized production build
+// Outputs to .next/ directory
+// Includes static HTML generation
+// Bundle size analysis
+```
+
+```json Production
+{
+  "scripts": {
+    "start": "next start"
+  }
+}
+
+// Usage (after build):
+npm run start
+// Serves production build
+// Runs on http://localhost:3000
+// No hot reload (production mode)
+```
+
+</CodeGroup>
+
+<Note>
+  The `--webpack` flag is used to ensure compatibility with certain dependencies. This is already configured in the project.
+</Note>
+
+## Directory Structure Explained
+
+```plaintext
+proyecto-eufrosine/
+├── app/                        # Next.js App Router
+│   ├── api/                   # API Routes (Backend)
+│   │   ├── contact/
+│   │   │   └── route.ts       # POST /api/contact
+│   │   └── complaint/
+│   │       └── route.ts       # POST /api/complaint
+│   ├── layout.tsx             # Root layout (SEO, fonts, navbar)
+│   ├── page.tsx               # Homepage (main content)
+│   └── globals.css            # Global styles & CSS variables
+│
+├── components/                 # React Components
+│   ├── ui/                    # Reusable UI primitives
+│   │   ├── badge.tsx         # Badge component
+│   │   ├── card.tsx          # Card component
+│   │   ├── label.tsx         # Form label
+│   │   ├── glowing-effect.tsx # Animated glow effect
+│   │   └── spinning-text.tsx  # Circular text animation
+│   │
+│   ├── navbar.tsx             # Navigation bar with mobile menu
+│   ├── lenisSmoothScroll.tsx  # Lenis smooth scroll wrapper
+│   ├── optimized-video.tsx    # Hero video with lazy loading
+│   ├── productsCarousel.tsx   # Product presentations carousel
+│   ├── offersCarousel.tsx     # Special offers carousel
+│   ├── offers.tsx             # Individual offer card
+│   ├── products.tsx           # Individual product card
+│   ├── process.tsx            # Water purification process
+│   ├── privacyPolicy.tsx      # Privacy policy modal
+│   ├── termsAndConditions.tsx # Terms modal
+│   ├── complaintBook.tsx      # Complaint book form
+│   ├── SocialShare.tsx        # Social sharing buttons
+│   ├── customStaggeredMenu.tsx # Animated mobile menu
+│   └── hook/
+│       └── useBodyScrollLock.ts # Hook to lock body scroll
+│
+├── lib/                        # Utilities & Helpers
+│   ├── fonts.ts               # Font configurations (Pacifico, MuseoModerno)
+│   └── utils.ts               # Utility functions (cn, classNames)
+│
+├── public/                     # Static Assets
+│   ├── img/                   # Images, logos, photos
+│   ├── svg/                   # SVG icons
+│   ├── favicon.ico           # Favicon
+│   └── robots.txt            # Robots.txt (generated)
+│
+├── .git/                       # Git repository
+├── .gitignore                 # Git ignore rules
+├── .env.local                 # Environment variables (CREATE THIS)
+├── components.json            # Shadcn/ui configuration
+├── next.config.ts             # Next.js configuration
+├── next-env.d.ts              # Next.js TypeScript declarations
+├── package.json               # Dependencies & scripts
+├── package-lock.json          # Dependency lock file
+├── postcss.config.mjs         # PostCSS configuration
+├── README.md                  # Project README
+├── robots.ts                  # Dynamic robots.txt generator
+├── sitemap.ts                 # Dynamic sitemap generator
+├── tailwind.config.ts         # Tailwind CSS configuration (if exists)
+└── tsconfig.json              # TypeScript configuration
+```
+
+## Database & Backend
+
+<Note>
+  **Current Setup**: Eufrosine does not use a database. All content is static or managed through environment variables.
+</Note>
+
+### Email System
+
+The contact and complaint forms use **Nodemailer** to send emails via SMTP:
+
+```typescript app/api/contact/route.ts (Simplified)
+import nodemailer from "nodemailer";
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  try {
+    const { name, email, phone, message } = await request.json();
+
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Send email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_TO,
+      subject: `Nuevo mensaje de ${name}`,
+      html: `
+        <h2>Nuevo mensaje desde el sitio web</h2>
+        <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Teléfono:</strong> ${phone || "No proporcionado"}</p>
+        <p><strong>Mensaje:</strong></p>
+        <p>${message}</p>
+      `,
+    });
+
+    return NextResponse.json(
+      { message: "Email sent successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return NextResponse.json(
+      { error: "Failed to send email" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## Testing the Installation
+
+<Steps>
+  <Step title="Run the Development Server">
+    ```bash
+    npm run dev
+    ```
+
+    Verify no errors in the terminal.
+  </Step>
+
+  <Step title="Test Homepage Features">
+    Open [http://localhost:3000](http://localhost:3000)
+
+    **Check these elements:**
+    - [ ] Hero video loads and plays
+    - [ ] Navbar is visible and responsive
+    - [ ] Smooth scrolling works when clicking nav links
+    - [ ] "Nuestras Presentaciones" carousel swipes correctly
+    - [ ] "Ofertas Especiales" carousel displays offers
+    - [ ] "Eventos" section shows event cards
+    - [ ] Footer displays social media links
+  </Step>
+
+  <Step title="Test Mobile Responsiveness">
+    Open browser DevTools (F12) and toggle device toolbar (Ctrl+Shift+M)
+
+    **Test on these viewports:**
+    - iPhone SE (375px)
+    - iPad (768px)
+    - Desktop (1920px)
+
+    **Verify:**
+    - [ ] Mobile menu works (hamburger icon)
+    - [ ] Carousels are swipeable
+    - [ ] Text is readable
+    - [ ] Images are properly sized
+  </Step>
+
+  <Step title="Test Contact Form">
+    Scroll to "Contáctanos" section
+
+    1. Fill in all fields
+    2. Click "Enviar Mensaje"
+    3. Wait for SweetAlert2 success message
+    4. Check email inbox for the message
+
+    <Warning>
+      If the form fails, check:
+      - `.env.local` has correct credentials
+      - Email account allows less secure apps (if using Gmail)
+      - Check browser console for error messages
+      - Check terminal logs for Node.js errors
+    </Warning>
+  </Step>
+
+  <Step title="Build for Production">
+    Test that the project builds without errors:
+
+    ```bash
+    npm run build
+    ```
+
+    You should see:
+    ```bash
+    ✓ Compiled successfully
+    ✓ Linting and checking validity of types
+    ✓ Collecting page data
+    ✓ Generating static pages (5/5)
+    ✓ Finalizing page optimization
+
+    Route (app)                              Size     First Load JS
+    ┌ ○ /                                    142 kB          385 kB
+    ├ ○ /api/contact                         0 B                0 B
+    └ ○ /api/complaint                       0 B                0 B
+    ```
+
+    Then test production build:
+    ```bash
+    npm run start
+    ```
+  </Step>
+</Steps>
+
+## Deployment
+
+<Tabs>
+  <Tab title="Vercel (Recommended)">
+    **One-Click Deploy**
+
+    1. Push code to GitHub/GitLab/Bitbucket
+    2. Go to [Vercel Dashboard](https://vercel.com/new)
+    3. Import your repository
+    4. Configure environment variables:
+       - Add all variables from `.env.local`
+    5. Click "Deploy"
+
+    **Environment Variables in Vercel:**
+    - Go to Project Settings → Environment Variables
+    - Add each variable from `.env.local`
+    - Redeploy after adding variables
+
+    <Check>
+      **Automatic Features:**
+      - SSL certificate
+      - CDN distribution
+      - Preview deployments for PRs
+      - Automatic builds on push
+    </Check>
+  </Tab>
+
+  <Tab title="Netlify">
+    **Deploy to Netlify**
+
+    1. Build settings:
+       - Build command: `npm run build`
+       - Publish directory: `.next`
+    
+    2. Add `netlify.toml` to project root:
+       ```toml
+       [build]
+         command = "npm run build"
+         publish = ".next"
+
+       [[plugins]]
+         package = "@netlify/plugin-nextjs"
+       ```
+
+    3. Set environment variables in Netlify dashboard
+    4. Deploy
+  </Tab>
+
+  <Tab title="Docker">
+    **Containerized Deployment**
+
+    Create `Dockerfile`:
+    ```dockerfile
+    FROM node:20-alpine AS base
+
+    # Dependencies
+    FROM base AS deps
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm ci
+
+    # Builder
+    FROM base AS builder
+    WORKDIR /app
+    COPY --from=deps /app/node_modules ./node_modules
+    COPY . .
+    RUN npm run build
+
+    # Runner
+    FROM base AS runner
+    WORKDIR /app
+    ENV NODE_ENV=production
+    COPY --from=builder /app/public ./public
+    COPY --from=builder /app/.next/standalone ./
+    COPY --from=builder /app/.next/static ./.next/static
+
+    EXPOSE 3000
+    CMD ["node", "server.js"]
+    ```
+
+    Build and run:
+    ```bash
+    docker build -t eufrosine .
+    docker run -p 3000:3000 --env-file .env.local eufrosine
+    ```
+  </Tab>
+
+  <Tab title="VPS / Traditional Hosting">
+    **Deploy to VPS (DigitalOcean, AWS EC2, etc.)**
+
+    1. SSH into server
+    2. Install Node.js 20+
+    3. Clone repository
+    4. Install dependencies:
+       ```bash
+       npm ci --production
+       ```
+    5. Create `.env.local` with production values
+    6. Build:
+       ```bash
+       npm run build
+       ```
+    7. Start with PM2:
+       ```bash
+       npm install -g pm2
+       pm2 start npm --name "eufrosine" -- start
+       pm2 save
+       pm2 startup
+       ```
+
+    **Nginx reverse proxy** (`/etc/nginx/sites-available/eufrosine`):
+    ```nginx
+    server {
+        listen 80;
+        server_name eufrosine.com www.eufrosine.com;
+
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Post-Installation Checklist
+
+<Check>
+  - [ ] Node.js 20+ installed
+  - [ ] Dependencies installed successfully
+  - [ ] `.env.local` created and configured
+  - [ ] Development server runs without errors
+  - [ ] Homepage loads correctly
+  - [ ] Smooth scrolling works
+  - [ ] Carousels are interactive
+  - [ ] Contact form sends emails
+  - [ ] Mobile responsive design verified
+  - [ ] Production build completes successfully
+  - [ ] Environment variables configured for production
+  - [ ] Domain configured (if applicable)
+  - [ ] SSL certificate installed (if applicable)
+</Check>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Get your site running in minutes
+  </Card>
+  
+  <Card title="Component Reference" icon="cube" href="/components/overview">
+    Explore available UI components
+  </Card>
+  
+  <Card title="API Documentation" icon="code" href="/api/contact">
+    Understand the backend endpoints
+  </Card>
+  
+  <Card title="Deployment Guide" icon="rocket" href="/deployment/vercel">
+    Deploy to production platforms
+  </Card>
+</CardGroup>
