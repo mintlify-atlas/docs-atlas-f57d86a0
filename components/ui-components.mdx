@@ -659,3 +659,77 @@ const className = cn(
 - Disabled state handling
 - Semantic HTML structure
 - Keyboard navigation support
+
+---
+
+## Process Grid Component
+
+Location: `components/process.tsx`
+
+### Description
+
+A specialized grid component that showcases the water purification process with interactive hover effects. Displays process steps with images, icons, titles, and descriptions.
+
+### Component Export
+
+```tsx
+export function GlowingEffectDemoSecond()
+```
+
+### Features
+
+- 4-step purification process display
+- Responsive grid layout (1 column mobile, 2 columns desktop)
+- Image backgrounds with hover zoom
+- Overlay fade effect on hover
+- Lucide icons for each step
+- Neumorphic shadow effects
+
+### Usage
+
+```tsx
+import { GlowingEffectDemoSecond } from "@/components/process";
+
+export default function ProcessSection() {
+  return (
+    <section className="py-20">
+      <h2 className="text-3xl font-bold text-center mb-8">Our Process</h2>
+      <GlowingEffectDemoSecond />
+    </section>
+  );
+}
+```
+
+### Process Steps Included
+
+1. **Filtración Múltiple** - Multi-stage filtration system
+2. **Purificación Avanzada** - Advanced purification with reverse osmosis and UV light
+3. **Control de Calidad** - Quality control and laboratory analysis
+4. **Embotellado y Distribución** - Automated bottling and distribution
+
+### Technical Details
+
+- Uses Lucide React icons: `Filter`, `Beaker`, `CheckCircle`, `Truck`
+- Background images from `/img/` directory
+- Neumorphic shadows with Tailwind CSS
+- Hover effects: image scale (105%), overlay fade, content slide
+- Transition duration: 700ms for smooth animations
+
+### GridItem Props
+
+```tsx
+interface GridItemProps {
+  imageUrl: string;           // Path to background image
+  icon: React.ReactNode;      // Lucide icon component
+  title: string;              // Process step title
+  description: React.ReactNode; // Process step description
+}
+```
+
+### Styling
+
+- Shadow levels: mobile (4px), tablet (8px), desktop (15px)
+- Border radius: `rounded-3xl`
+- Overlay: `bg-zinc-200/90` default, `bg-black/20` on hover
+- Icon background: `bg-blue-800`
+- Text colors: `text-blue-700` (title), `text-black` (description)
